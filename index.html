@@ -56,6 +56,8 @@
   .btn.primary:hover{background:#363636}
   .btn.ghost{border-color:transparent;background:transparent;color:var(--accent-2)}
   .btn.ghost:hover{background:var(--accent-soft)}
+  .btn:disabled{opacity:.38;cursor:not-allowed}
+  .btn:disabled:hover{background:var(--accent)}
   .spacer{flex:1}
   .running{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--good);font-weight:500}
   .dot{width:7px;height:7px;border-radius:50%;background:var(--good);box-shadow:0 0 0 0 rgba(52,199,89,.5);animation:pulse 1.6s infinite}
@@ -226,12 +228,12 @@
     <section class="screen active" id="screen-workbench">
       <div class="wb-top">
         <div class="field"><label>Case</label>
-          <select><option>Case_20240520_001 · 客户咨询_产品介绍</option><option>Case_002 · 对外动作_订票确认</option><option>Case_003 · 记忆冲突_地址更新</option></select>
+          <select id="caseSel"><option>Case_20240520_001 · 客户咨询_产品介绍</option><option>Case_002 · 对外动作_订票确认</option><option>Case_003 · 记忆冲突_地址更新</option></select>
         </div>
         <div class="field"><label>用户身份</label>
           <select><option>普通用户</option><option>老用户(有历史收藏)</option><option>新用户</option></select>
         </div>
-        <button class="btn" onclick="toast('已切换 Case（demo）')">切换 Case</button>
+        <button class="btn primary" id="runBtn" disabled>开始运行</button>
         <div class="spacer"></div>
         <span class="running"><span class="dot"></span>对比跑 运行中</span>
         <button class="btn" onclick="toast('对比跑已重新触发（demo）')">重跑</button>
@@ -573,6 +575,25 @@ function toast(msg){
   t.textContent=msg; t.classList.add('show');
   clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),2200);
 }
+
+/* run button: 换 case 后可点“开始运行”，结果出来后置灰 */
+const caseSel=document.getElementById('caseSel');
+const runBtn=document.getElementById('runBtn');
+caseSel.addEventListener('change',()=>{
+  runBtn.disabled=false; runBtn.textContent='开始运行';
+  toast('已切换到新 case，点“开始运行”跑一遍');
+});
+runBtn.addEventListener('click',()=>{
+  if(runBtn.disabled) return;
+  runBtn.disabled=true; runBtn.textContent='运行中…';
+  toast('对比跑运行中…');
+  setTimeout(()=>{
+    renderCenter(); renderRail();      // 结果刷新（demo 用同一批 mock）
+    runBtn.textContent='开始运行';
+    runBtn.disabled=true;              // 结果已出 → 置灰，直到再次切换 case
+    toast('运行完成，结果已更新');
+  },1200);
+});
 
 /* init */
 renderModules(); renderCenter(); renderRail();
