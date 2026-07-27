@@ -159,10 +159,14 @@
   .seg button.on{background:var(--surface);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.12);font-weight:600}
 
   /* module list */
-  .mod{display:flex;align-items:center;justify-content:space-between;padding:11px 13px;border:1px solid var(--border-2);border-radius:12px;margin-bottom:8px;background:var(--surface);transition:.15s}
+  .mod{display:block;padding:11px 13px;border:1px solid var(--border-2);border-radius:12px;margin-bottom:8px;background:var(--surface);transition:.15s}
   .mod:hover{background:var(--surface-2)}
   .mod .mn{font-weight:600;font-size:13px;letter-spacing:-.01em}
   .mod .mt{font-size:10.5px;color:var(--text-3);margin-top:1px}
+  .mod-ab{display:flex;gap:8px;margin-top:9px}
+  .mab{flex:1;display:flex;align-items:center;gap:5px;min-width:0}
+  .mab-l{font-size:10px;font-weight:700;color:var(--text-3);flex:0 0 auto}
+  .mab .mod-ver{flex:1;min-width:0}
   .mod.changed .mn::after{content:"● 改";color:var(--blue);margin-left:6px;font-size:9.5px;vertical-align:middle;font-weight:600}
   .sw{width:42px;height:25px;border-radius:25px;background:#e9e9ea;position:relative;transition:.2s cubic-bezier(.4,0,.2,1);border:0;flex:0 0 auto}
   .sw::after{content:"";position:absolute;width:21px;height:21px;border-radius:50%;background:#fff;top:2px;left:2px;transition:.2s cubic-bezier(.4,0,.2,1);box-shadow:0 1px 3px rgba(0,0,0,.2)}
@@ -333,10 +337,8 @@
           <select><option>普通用户</option><option>老用户(有历史收藏)</option><option>新用户</option></select>
         </div>
         <button class="btn primary" id="runBtn" disabled>开始运行</button>
-        <button class="btn primary" onclick="toast('已把实验版 v1.3.0 存入策略库')">存为新版本到策略库</button>
         <div class="spacer"></div>
         <span class="running" id="runIndicator" style="display:none"><span class="dot"></span>对比跑 运行中</span>
-        <button class="btn" onclick="startRun()">重跑</button>
       </div>
 
       <div class="wb-main">
@@ -345,9 +347,9 @@
           <div class="panel">
             <div class="panel-h">策略区 · 装配 <span class="muted" style="font-weight:500">实验版 B</span></div>
             <div class="panel-b">
-              <div class="sub">Harness 模块 <span style="color:var(--text-3);font-weight:400">（agent = model + harness；Orchestration 暂由算法团队设计，不在此调）</span></div>
+              <div class="sub">Harness 模块 <span style="color:var(--text-3);font-weight:400">（A 对照组 · B 实验组；Orchestration 暂由算法团队设计）</span></div>
               <div id="modlist"></div>
-              <button class="addbtn" onclick="toast('新增模块：定类型标识 + 配置 schema + 内容')">+ 添加模块</button>
+              <button class="btn primary" style="width:100%;margin-top:12px" onclick="toast('已把实验版 B 存入策略库')">存为新版本到策略库</button>
             </div>
           </div>
         </aside>
@@ -448,13 +450,13 @@
 <script>
 /* ---------------- mock data ---------------- */
 const modules = [
-  {id:'prompt',  name:'Prompt / 人设',        type:'system_prompt', ver:'v1.3.0', versions:['v1.3.0','v1.2.3','v1.0.0'], changed:true},
-  {id:'context', name:'Context / 上下文',      type:'context',       ver:'v1.2.3', versions:['v1.2.3','v1.0.0'], changed:false},
-  {id:'memory',  name:'Memory / 记忆',        type:'memory',        ver:'v1.3.0', versions:['v1.3.0','v1.2.3'], changed:true},
-  {id:'tools',   name:'Tools / 工具',         type:'toolset',       ver:'v1.2.3', versions:['v1.2.3'], changed:false},
-  {id:'output',  name:'Output / 输出呈现',    type:'output',        ver:'v1.2.3', versions:['v1.2.3'], changed:false},
-  {id:'guard',   name:'Guardrails / 护栏',    type:'guardrails',    ver:'v1.2.3', versions:['v1.2.3'], changed:false},
-  {id:'hooks',   name:'Hooks / 扩展',         type:'hooks',         ver:'v1.3.0', versions:['v1.3.0','v1.2.3'], changed:true},
+  {id:'prompt',  name:'Prompt / 人设',        type:'system_prompt', versions:['v1.3.0','v1.2.3','v1.0.0'], verA:'v1.2.3', verB:'v1.3.0'},
+  {id:'context', name:'Context / 上下文',      type:'context',       versions:['v1.2.3','v1.0.0'], verA:'v1.2.3', verB:'v1.2.3'},
+  {id:'memory',  name:'Memory / 记忆',        type:'memory',        versions:['v1.3.0','v1.2.3'], verA:'v1.2.3', verB:'v1.3.0'},
+  {id:'tools',   name:'Tools / 工具',         type:'toolset',       versions:['v1.2.3'], verA:'v1.2.3', verB:'v1.2.3'},
+  {id:'output',  name:'Output / 输出呈现',    type:'output',        versions:['v1.2.3'], verA:'v1.2.3', verB:'v1.2.3'},
+  {id:'guard',   name:'Guardrails / 护栏',    type:'guardrails',    versions:['v1.2.3'], verA:'v1.2.3', verB:'v1.2.3'},
+  {id:'hooks',   name:'Hooks / 扩展',         type:'hooks',         versions:['v1.3.0','v1.2.3'], verA:'v1.2.3', verB:'v1.3.0'},
 ];
 
 const convA = [
@@ -670,29 +672,23 @@ let tab = 'interact';
 /* ---------------- render ---------------- */
 function renderModules(){
   const el = document.getElementById('modlist');
-  el.innerHTML = modules.map(m=>`
-    <div class="mod ${m.changed?'changed':''}">
-      <div><div class="mn">${m.name}</div><div class="mt">${m.type}</div></div>
-      <div class="mod-r">
-        <select class="mod-ver" onchange="switchModVer('${m.id}',this.value)">
-          ${m.versions.map(v=>`<option ${v===m.ver?'selected':''}>${v}</option>`).join('')}
-        </select>
-        ${m.changed?`<span class="mod-diff" onclick="openLibDiff('${m.id}')">改前后</span>`:''}
+  el.innerHTML = modules.map(m=>{
+    const changed = m.verA!==m.verB;
+    const opt=(sel)=>m.versions.map(v=>`<option ${v===sel?'selected':''}>${v}</option>`).join('');
+    return `<div class="mod ${changed?'changed':''}">
+      <div class="mn">${m.name}</div><div class="mt">${m.type}</div>
+      <div class="mod-ab">
+        <div class="mab"><span class="mab-l">A</span><select class="mod-ver" onchange="setVer('${m.id}','A',this.value)">${opt(m.verA)}</select></div>
+        <div class="mab"><span class="mab-l">B</span><select class="mod-ver" onchange="setVer('${m.id}','B',this.value)">${opt(m.verB)}</select></div>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
-function switchModVer(id,v){
+function setVer(id,side,v){
   const m=modules.find(x=>x.id===id); if(!m) return;
-  m.ver=v; m.changed = (v!==m.versions[m.versions.length-1]); // 非最老(基线)版即视为改动
+  if(side==='A') m.verA=v; else m.verB=v;
   renderModules();
-  toast('切换 '+m.name+' → '+v);
-}
-function openLibDiff(id){
-  libSel=id; libMode='diff';
-  document.querySelectorAll('.nav-item').forEach(x=>x.classList.toggle('active', x.dataset.screen==='strategy'));
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById('screen-strategy').classList.add('active');
-  renderLib();
+  toast(m.name+(side==='A'?' 对照组 A':' 实验组 B')+' → '+v);
 }
 
 function phone(conv, variant){
@@ -758,15 +754,14 @@ function renderCenter(){
       </div>
     </div>`;
   } else if(tab==='stratdiff'){
-    const changed = modules.filter(m=>m.changed);
-    const baseVer = m=>m.versions[m.versions.length-1];
+    const changed = modules.filter(m=>m.verA!==m.verB);
     const body = !changed.length
-      ? `<div class="sub">B 与基线一致，无策略改动。</div>`
+      ? `<div class="sub">A / B 各模块版本一致，无策略差异。</div>`
       : changed.map(m=>{
           const d=moduleDiffs[m.id]||[];
           const diff = d.map(x=>x.ctx?`<span class="ctx">${esc(x.ctx)}</span>`:x.del?`<span class="del">${esc(x.del)}</span>`:`<span class="add">${esc(x.add)}</span>`).join('<br>');
           return `<div style="margin-bottom:16px">
-            <div style="font-weight:600;font-size:13px;margin-bottom:6px">${m.name} <span class="muted" style="font-weight:400">${m.type} · ${baseVer(m)} → ${m.ver}</span></div>
+            <div style="font-weight:600;font-size:13px;margin-bottom:6px">${m.name} <span class="muted" style="font-weight:400">${m.type} · A ${m.verA} → B ${m.verB}</span></div>
             <div class="diffbox">${diff||'（无字段级 diff）'}</div>
           </div>`;
         }).join('');
