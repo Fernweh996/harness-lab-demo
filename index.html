@@ -344,6 +344,7 @@
         <section class="eval-region">
           <div class="wb-tabs" id="wbtabs">
             <div class="tab active" data-tab="interact">交互对比</div>
+            <div class="tab" data-tab="stratdiff">策略对比</div>
             <div class="tab" data-tab="trace">轨迹对比</div>
             <div class="tab" data-tab="metrics">指标对比</div>
             <div class="tab" data-tab="eval">效果评估</div>
@@ -731,7 +732,7 @@ function saveCase(tag,kind){ toast('已存为 '+(kind==='good'?'good':'bad')+'ca
 
 function renderCenter(){
   const el = document.getElementById('centerpane');
-  const mc = document.getElementById('metricsCol'); if(mc) mc.style.display = (tab==='trace')?'none':'';
+  const mc = document.getElementById('metricsCol'); if(mc) mc.style.display = (tab==='trace'||tab==='stratdiff')?'none':'';
   if(tab==='interact'){
     el.innerHTML = `<div class="preview-wrap">
       <div class="ab">
@@ -745,6 +746,24 @@ function renderCenter(){
       </div>
       </div>
     </div>`;
+  } else if(tab==='stratdiff'){
+    const changed = modules.filter(m=>m.changed);
+    const baseVer = m=>m.versions[m.versions.length-1];
+    const body = !changed.length
+      ? `<div class="sub">B 与基线一致，无策略改动。</div>`
+      : changed.map(m=>{
+          const d=moduleDiffs[m.id]||[];
+          const diff = d.map(x=>x.ctx?`<span class="ctx">${esc(x.ctx)}</span>`:x.del?`<span class="del">${esc(x.del)}</span>`:`<span class="add">${esc(x.add)}</span>`).join('<br>');
+          return `<div style="margin-bottom:16px">
+            <div style="font-weight:600;font-size:13px;margin-bottom:6px">${m.name} <span class="muted" style="font-weight:400">${m.type} · ${baseVer(m)} → ${m.ver}</span></div>
+            <div class="diffbox">${diff||'（无字段级 diff）'}</div>
+          </div>`;
+        }).join('');
+    el.innerHTML = `
+      <div class="panel">
+        <div class="panel-h">策略改前后对比 · A（基线 v1.2.3）vs B（实验 v1.3.0） <span class="muted" style="font-weight:500">${changed.length} 个模块改动</span></div>
+        <div class="panel-b">${body}</div>
+      </div>`;
   } else if(tab==='trace'){
     el.innerHTML = `
       <div class="chain-wrap">
