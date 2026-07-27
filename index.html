@@ -167,9 +167,10 @@
 
   /* metrics detail tab */
   table{width:100%;border-collapse:collapse;font-size:12.5px}
-  th,td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--border-2)}
+  th,td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--border-2);vertical-align:middle}
   th{color:var(--text-3);font-weight:500;font-size:11.5px;background:transparent}
   td.num{text-align:right;font-variant-numeric:tabular-nums}
+  th.c,td.c{text-align:center;font-variant-numeric:tabular-nums}
   .bar{height:6px;border-radius:4px;background:rgba(0,0,0,.06);position:relative;margin-top:4px;overflow:hidden}
   .bar>span{position:absolute;left:0;top:0;bottom:0;border-radius:4px}
   .worse-list{margin:0;padding:0;list-style:none}
@@ -489,16 +490,16 @@ function renderCenter(){
     const rows = metrics.map(m=>`
       <tr>
         <td>${m.name}</td>
-        <td class="num">${m.a}</td>
-        <td class="num">${m.b}</td>
-        <td class="num"><span class="delta ${m.dir}">${arrow(m.dir)} ${m.delta}</span></td>
+        <td class="c">${m.a}</td>
+        <td class="c">${m.b}</td>
+        <td class="c"><span class="delta ${m.dir}">${arrow(m.dir)} ${m.delta}</span></td>
       </tr>`).join('');
     el.innerHTML = `
       <div class="panel">
         <div class="panel-h">指标对比 · A (基线 v1.2.3) vs B (实验 v1.3.0) <span class="muted" style="font-weight:500">case set 客户咨询回归 (8)</span></div>
         <div class="panel-b" style="padding:0">
           <table>
-            <thead><tr><th>指标</th><th class="num">A</th><th class="num">B</th><th class="num">净变化</th></tr></thead>
+            <thead><tr><th style="width:34%">指标</th><th class="c">A</th><th class="c">B</th><th class="c">净变化</th></tr></thead>
             <tbody>${rows}</tbody>
           </table>
         </div>
