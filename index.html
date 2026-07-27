@@ -228,7 +228,7 @@
     <section class="screen active" id="screen-workbench">
       <div class="wb-top">
         <div class="field"><label>Case</label>
-          <select id="caseSel"><option>Case_20240520_001 · 客户咨询_产品介绍</option><option>Case_002 · 对外动作_订票确认</option><option>Case_003 · 记忆冲突_地址更新</option></select>
+          <select id="caseSel"><option>Case_20260724_001 · 客户咨询_产品介绍</option><option>Case_20260724_002 · 对外动作_订票确认</option><option>Case_20260724_003 · 记忆冲突_地址更新</option></select>
         </div>
         <div class="field"><label>用户身份</label>
           <select><option>普通用户</option><option>老用户(有历史收藏)</option><option>新用户</option></select>
@@ -267,7 +267,7 @@
               <div class="sub" style="margin-top:14px">底座 <span class="lock">只读 · 算法团队维护</span></div>
               <div class="core">
                 <div class="ct">Model</div>
-                <div class="cn">gpt-4.1</div>
+                <div class="cn">gpt-5.4</div>
                 <div class="ct" style="margin-top:9px">Harness Runtime（引擎）</div>
                 <div class="cn">opencc v1.2.3 <span class="running" style="margin-left:6px"><span class="dot"></span>运行中</span></div>
                 <div style="margin-top:9px;font-size:10.5px;color:var(--text-3)">agent = model + harness；上方 8 个模块 = 可调 harness</div>
@@ -369,8 +369,8 @@
         <h2>设置</h2>
         <p class="lead">环境、模型、配额。（mock）</p>
         <div class="card2"><div class="kv"><span class="k">运行环境</span><span>测试 sandbox（外部工具默认 mock/回放）</span></div>
-          <div class="kv"><span class="k">默认模型</span><span>gpt-4.1</span></div>
-          <div class="kv"><span class="k">评审模型 (LLM judge)</span><span>gpt-4.1-mini（独立于被测模型）</span></div>
+          <div class="kv"><span class="k">默认模型（被测）</span><span>gpt-5.4</span></div>
+          <div class="kv"><span class="k">评审模型 (LLM judge)</span><span>gpt-5.5（独立于被测，更强模型评审）</span></div>
           <div class="kv"><span class="k">单日成本配额</span><span>$50 / 天</span></div>
         </div>
       </div>
