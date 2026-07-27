@@ -72,8 +72,14 @@
 
   /* ---------- workbench body ---------- */
   .wb-body{flex:1;display:flex;gap:18px;padding:20px 22px;overflow:auto}
-  .col-config{flex:0 0 288px;width:288px;border-right:1px solid var(--border-2);padding-right:18px}
-  .col-center{flex:1;min-width:520px}
+  .wb-main{flex:1;display:flex;overflow:hidden;min-height:0}
+  .strategy-region{flex:0 0 300px;width:300px;overflow:auto;padding:16px 16px;border-right:1px solid var(--border);background:var(--surface)}
+  .strategy-region .panel{border:0;box-shadow:none;background:transparent;border-radius:0}
+  .strategy-region .panel-h{padding:6px 4px 12px}
+  .strategy-region .panel-b{padding:4px}
+  .eval-region{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+  .eval-body{flex:1;display:flex;gap:18px;padding:20px;overflow:auto}
+  .col-center{flex:1;min-width:500px}
   .col-metrics{flex:0 0 236px;width:236px}
   .region-h{font-size:12.5px;font-weight:600;color:var(--text);letter-spacing:-.01em;margin:0 0 14px;padding-bottom:9px;border-bottom:1px solid var(--border-2)}
   .region-h .rh-sub{font-weight:400;color:var(--text-3);font-size:11.5px;margin-left:6px}
@@ -240,20 +246,11 @@
         <button class="btn" onclick="toast('对比跑已重新触发（demo）')">重跑</button>
       </div>
 
-      <div class="wb-tabs" id="wbtabs">
-        <div class="tab active" data-tab="interact">交互对比</div>
-        <div class="tab" data-tab="metrics">指标对比</div>
-        <div class="tab" data-tab="eval">效果评估</div>
-        <div class="spacer"></div>
-        <button class="btn ghost" onclick="toast('带 run/trace id 跳转算法团队 trace 工具（demo）')">看轨迹 →</button>
-        <button class="btn primary" onclick="toast('已把实验版 v1.3.0 存入策略库（demo）')">存为新版本到策略库</button>
-      </div>
-
-      <div class="wb-body">
-        <!-- config -->
-        <div class="col-config">
+      <div class="wb-main">
+        <!-- ===== 策略区（左） ===== -->
+        <aside class="strategy-region">
           <div class="panel">
-            <div class="panel-h">策略装配 <span class="muted" style="font-weight:500">实验版 B</span></div>
+            <div class="panel-h">策略区 · 装配 <span class="muted" style="font-weight:500">实验版 B</span></div>
             <div class="panel-b">
               <div class="sub">产品交互端</div>
               <div class="seg" id="clientseg" style="margin-bottom:12px">
@@ -271,22 +268,32 @@
                 <div class="cn">gpt-5.4</div>
                 <div class="ct" style="margin-top:9px">Harness Runtime（引擎）</div>
                 <div class="cn">opencc v1.2.3 <span class="running" style="margin-left:6px"><span class="dot"></span>运行中</span></div>
-                <div style="margin-top:9px;font-size:10.5px;color:var(--text-3)">agent = model + harness；上方 8 个模块 = 可调 harness</div>
+                <div style="margin-top:9px;font-size:10.5px;color:var(--text-3)">agent = model + harness；上方即可调 harness 模块</div>
               </div>
             </div>
           </div>
-        </div>
+        </aside>
 
-        <!-- center (swaps by tab) -->
-        <div class="col-center" id="centerpane"></div>
-
-        <!-- metrics rail -->
-        <div class="col-metrics">
-          <div class="panel">
-            <div class="panel-h">实时指标对比 <span class="muted" style="font-weight:500">A / B</span></div>
-            <div class="panel-b" id="metricrail"></div>
+        <!-- ===== 评估区（右） ===== -->
+        <section class="eval-region">
+          <div class="wb-tabs" id="wbtabs">
+            <div class="tab active" data-tab="interact">交互对比</div>
+            <div class="tab" data-tab="metrics">指标对比</div>
+            <div class="tab" data-tab="eval">效果评估</div>
+            <div class="spacer"></div>
+            <button class="btn ghost" onclick="toast('带 run/trace id 跳转算法团队 trace 工具（demo）')">看轨迹 →</button>
+            <button class="btn primary" onclick="toast('已把实验版 v1.3.0 存入策略库（demo）')">存为新版本到策略库</button>
           </div>
-        </div>
+          <div class="eval-body">
+            <div class="col-center" id="centerpane"></div>
+            <div class="col-metrics">
+              <div class="panel">
+                <div class="panel-h">实时指标对比 <span class="muted" style="font-weight:500">A / B</span></div>
+                <div class="panel-b" id="metricrail"></div>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
     </section>
 
