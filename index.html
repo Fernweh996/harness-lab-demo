@@ -260,6 +260,7 @@
           <select><option>普通用户</option><option>老用户(有历史收藏)</option><option>新用户</option></select>
         </div>
         <button class="btn primary" id="runBtn" disabled>开始运行</button>
+        <button class="btn primary" onclick="toast('已把实验版 v1.3.0 存入策略库')">存为新版本到策略库</button>
         <div class="spacer"></div>
         <span class="running" id="runIndicator" style="display:none"><span class="dot"></span>对比跑 运行中</span>
         <button class="btn" onclick="startRun()">重跑</button>
@@ -285,9 +286,6 @@
             <div class="tab" data-tab="trace">轨迹对比</div>
             <div class="tab" data-tab="metrics">指标对比</div>
             <div class="tab" data-tab="eval">效果评估</div>
-            <div class="spacer"></div>
-            <button class="btn ghost" onclick="toast('带 run/trace id 跳转算法团队 trace 工具')">看轨迹 →</button>
-            <button class="btn primary" onclick="toast('已把实验版 v1.3.0 存入策略库')">存为新版本到策略库</button>
           </div>
           <div class="eval-body">
             <div class="col-center" id="centerpane"></div>
