@@ -82,6 +82,7 @@
   .region-h{font-size:12.5px;font-weight:600;color:var(--text);letter-spacing:-.01em;margin:0 0 14px;padding-bottom:9px;border-bottom:1px solid var(--border-2)}
   .region-h .rh-sub{font-weight:400;color:var(--text-3);font-size:11.5px;margin-left:6px}
   .preview-wrap{display:flex;flex-direction:column;height:100%}
+  .preview-bar{display:flex;align-items:center;margin-bottom:12px}
   /* trace compare (langfuse-like) */
   .trace-stack{display:flex;flex-direction:column;gap:14px}
   .trace-col{background:var(--surface);border:1px solid var(--border-2);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
@@ -269,12 +270,6 @@
           <div class="panel">
             <div class="panel-h">策略区 · 装配 <span class="muted" style="font-weight:500">实验版 B</span></div>
             <div class="panel-b">
-              <div class="sub">产品交互端</div>
-              <div class="seg" id="clientseg" style="margin-bottom:12px">
-                <button class="on" data-client="wechat">微信</button>
-                <button data-client="app">App</button>
-              </div>
-
               <div class="sub">Harness 模块 <span style="color:var(--text-3);font-weight:400">（agent = model + harness；Orchestration 暂由算法团队设计，不在此调）</span></div>
               <div id="modlist"></div>
               <button class="addbtn" onclick="toast('新增模块：定类型标识 + 配置 schema + 内容')">+ 添加模块</button>
@@ -514,6 +509,10 @@ function renderCenter(){
   const mc = document.getElementById('metricsCol'); if(mc) mc.style.display = (tab==='trace')?'none':'';
   if(tab==='interact'){
     el.innerHTML = `<div class="preview-wrap">
+      <div class="preview-bar"><div class="seg">
+        <button class="${client==='wechat'?'on':''}" onclick="setClient('wechat')">微信</button>
+        <button class="${client==='app'?'on':''}" onclick="setClient('app')">App</button>
+      </div></div>
       <div class="ab">
       <div class="ab-col">
         <div class="ab-head"><span class="ab-title">A</span><span class="ab-badge a">基线 v1.2.3</span></div>
@@ -616,12 +615,7 @@ function renderRail(){
 function arrow(dir){ return dir==='good'?'▲':dir==='bad'?'▼':'＝'; }
 
 /* ---------------- interactions ---------------- */
-document.getElementById('clientseg').addEventListener('click',e=>{
-  const b=e.target.closest('button'); if(!b)return;
-  client=b.dataset.client;
-  document.querySelectorAll('#clientseg button').forEach(x=>x.classList.toggle('on',x===b));
-  if(tab==='interact') renderCenter();
-});
+function setClient(c){ client=c; renderCenter(); }
 document.getElementById('wbtabs').addEventListener('click',e=>{
   const t=e.target.closest('.tab'); if(!t)return;
   tab=t.dataset.tab;
