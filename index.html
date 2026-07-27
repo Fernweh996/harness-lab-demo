@@ -168,11 +168,13 @@
   .metric:last-child{border-bottom:0}
   .metric .mname{font-size:11.5px;color:var(--text-3);margin-bottom:4px}
   .mtag{display:inline-block;font-size:9px;font-weight:600;color:var(--accent-2);background:var(--accent-soft);border-radius:6px;padding:1px 6px;margin-left:5px;vertical-align:middle}
-  .hi{display:flex;gap:6px;margin-top:8px}
-  .hi-in{flex:1;min-width:0;border:1px solid var(--border);border-radius:8px;padding:5px 8px;font-size:12px;font-family:inherit;color:var(--text)}
-  .hi-in::placeholder{color:var(--text-3)}
-  .hi-btn{border:1px solid var(--border);background:var(--surface);border-radius:8px;padding:5px 11px;font-size:12px;color:var(--text-2);white-space:nowrap}
+  .hi-note{margin-top:12px;padding-top:12px;border-top:1px solid var(--border-2)}
+  .hi-label{font-size:11.5px;color:var(--text-2);font-weight:500;margin-bottom:6px}
+  .hi-ta{width:100%;box-sizing:border-box;border:1px solid var(--border);border-radius:10px;padding:8px 10px;font-size:12px;font-family:inherit;color:var(--text);resize:vertical;min-height:56px;line-height:1.5}
+  .hi-ta::placeholder{color:var(--text-3)}
+  .hi-btn{border:1px solid var(--border);background:var(--surface);border-radius:8px;padding:6px 11px;font-size:12px;color:var(--text-2);white-space:nowrap}
   .hi-btn:hover{background:var(--surface-2)}
+  .hi-full{width:100%;margin-top:6px}
   .metric .mrow{display:flex;align-items:baseline;justify-content:space-between}
   .metric .mv{font-size:15px;font-weight:600;letter-spacing:-.01em}
   .metric .mv .mb{color:var(--text-3);font-weight:500;font-size:12px;margin-left:5px}
@@ -611,8 +613,13 @@ function renderRail(){
         <div class="mv">${m.a}<span class="mb">→ ${m.b}</span></div>
         <span class="delta ${m.dir}">${arrow(m.dir)} ${m.delta}</span>
       </div>
-      ${m.src==='人评'?`<div class="hi"><input class="hi-in" type="number" min="1" max="5" step="0.1" placeholder="输入人评分 1–5"><button class="hi-btn" onclick="toast('已记录人工评分')">记录</button></div>`:''}
-    </div>`).join('') + '<div class="sub" style="margin:10px 0 0">人评=含人工评分，其余为自动评测；完整 7 项见「指标对比」</div>';
+    </div>`).join('')
+    + `<div class="sub" style="margin:10px 0 0">人评=含人工评分，其余为自动评测；完整 7 项见「指标对比」</div>`
+    + `<div class="hi-note">
+        <div class="hi-label">人工评语</div>
+        <textarea class="hi-ta" placeholder="对本次 A/B 的主观评价，如：B 更亲和但偏啰嗦、成本涨得不值"></textarea>
+        <button class="hi-btn hi-full" onclick="toast('已记录评语')">记录评语</button>
+      </div>`;
 }
 
 function arrow(dir){ return dir==='good'?'▲':dir==='bad'?'▼':'＝'; }
