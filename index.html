@@ -90,13 +90,22 @@
   .tr-h{padding:12px 16px;border-bottom:1px solid var(--border-2)}
   .tr-h .tr-t{font-weight:600;font-size:13px;display:flex;align-items:center;gap:8px}
   .tr-h .tr-meta{font-size:11px;color:var(--text-3);margin-top:3px}
-  .tr-body{padding:8px 16px 12px}
-  .tr-span{display:flex;align-items:center;gap:12px;padding:5px 0}
-  .tr-name{flex:0 0 176px;width:176px;font-size:11.5px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tr-body{padding:4px 16px 12px}
+  .tr-step{border-bottom:1px solid var(--border-2)}
+  .tr-step:last-child{border-bottom:0}
+  .tr-sum{display:flex;align-items:center;gap:12px;padding:8px 0;cursor:pointer;list-style:none}
+  .tr-sum::-webkit-details-marker{display:none}
+  .tr-sum:hover .tr-name{color:var(--accent-2)}
+  .tr-name{flex:0 0 200px;width:200px;font-size:11.5px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tr-name::before{content:'▸ ';color:var(--text-3)}
+  details[open] .tr-name::before{content:'▾ '}
   .tr-track{flex:1;position:relative;height:14px;background:rgba(0,0,0,.045);border-radius:5px}
   .tr-bar{position:absolute;top:3px;height:8px;border-radius:4px;background:#c7c7cc}
   .tr-bar.diff{background:var(--blue)}
   .tr-dur{flex:0 0 54px;width:54px;text-align:right;font-size:11px;color:var(--text-3);font-variant-numeric:tabular-nums}
+  .tr-io{margin:0 0 10px 16px;padding:8px 12px;border-left:2px solid var(--border-2);background:var(--surface-2);border-radius:0 8px 8px 0;font-size:11.5px;color:var(--text-2);display:flex;flex-direction:column;gap:5px}
+  .tr-io b{display:inline-block;width:34px;color:var(--text-3);font-weight:500;margin-right:8px;vertical-align:top}
+  .tr-step.diff .tr-io{border-left-color:var(--blue)}
   .panel{background:var(--surface);border:1px solid var(--border-2);border-radius:var(--radius);box-shadow:var(--shadow)}
   .panel-h{padding:14px 18px;border-bottom:1px solid var(--border-2);font-weight:600;font-size:13px;letter-spacing:-.01em;display:flex;align-items:center;justify-content:space-between}
   .panel-b{padding:16px 18px}
@@ -245,7 +254,7 @@
       <div class="nav-item" data-screen="runs"><span class="ic">≣</span>运行记录</div>
       <div class="nav-item" data-screen="settings"><span class="ic">⚙</span>设置</div>
     </nav>
-    <div class="side-foot">环境：<b>测试 sandbox</b><br>Core：<b>opencc v1.2.3</b><br>Model：<b>gpt-5.4</b><br><span style="opacity:.8">底座只读 · 算法团队维护</span></div>
+    <div class="side-foot">环境：<b>测试 sandbox</b><br>Core：<b>opencc v1.2.3</b><br>Model：<b>hy3</b><br><span style="opacity:.8">底座只读 · 算法团队维护</span></div>
   </aside>
 
   <!-- MAIN -->
@@ -380,8 +389,8 @@
         <h2>设置</h2>
         <p class="lead">环境、模型、配额。（mock）</p>
         <div class="card2"><div class="kv"><span class="k">运行环境</span><span>测试 sandbox（外部工具默认 mock/回放）</span></div>
-          <div class="kv"><span class="k">默认模型（被测）</span><span>gpt-5.4</span></div>
-          <div class="kv"><span class="k">评审模型 (LLM judge)</span><span>gpt-5.5（独立于被测，更强模型评审）</span></div>
+          <div class="kv"><span class="k">默认模型（被测）</span><span>hy3</span></div>
+          <div class="kv"><span class="k">评审模型 (LLM judge)</span><span>gpt-5.5（独立于被测模型评审）</span></div>
           <div class="kv"><span class="k">单日成本配额</span><span>$50 / 天</span></div>
         </div>
       </div>
@@ -430,25 +439,25 @@ const metrics = [
   {name:'错误率',          a:'8%',  b:'3%',    delta:'-5pp', dir:'good', rail:false},
 ];
 
-// trace 对比 mock（span 瀑布）；diff=B 相对 A 变化/新增
+// trace 对比 mock：每步含 输入/动作/输出，可展开；diff=B 相对 A 变化/新增
 const traceA=[
-  {label:'编排 / 分流',dur:30},
-  {label:'context 组装',dur:90},
-  {label:'memory 召回 · 命中2',dur:120},
-  {label:'模型调用 · planning',dur:500},
-  {label:'工具 · 知识库检索',dur:260},
-  {label:'模型调用 · 生成回复',dur:140},
-  {label:'输出',dur:100},
+  {label:'编排 / 分流',dur:30,io:{in:'用户「请介绍一下你们的智能客服产品」',act:'判定任务类型=T1 即时问答，走单链、不拆子任务',out:'路由 → 即时问答'}},
+  {label:'context 组装',dur:90,io:{in:'当前输入 + 近 3 轮 + 端=微信',act:'按 prompt v1 拼装，裁到 1.2k tokens',out:'context ready（纯文本能力）'}},
+  {label:'memory 召回 · 命中2',dur:120,io:{in:'query=「产品 介绍」',act:'精确召回 topK3，阈值 0.82',out:'命中 2 条（产品定位、支持渠道）'}},
+  {label:'模型调用 · planning',dur:500,io:{in:'context + system prompt v1',act:'规划：直接作答 + 检索知识库佐证',out:'计划 = 检索后作答'}},
+  {label:'工具 · 知识库检索',dur:260,io:{in:'q=「智能客服 功能/接入」',act:'查知识库',out:'命中 3 段'}},
+  {label:'模型调用 · 生成回复',dur:140,io:{in:'检索结果 + prompt（专业/200字）',act:'生成简洁回复',out:'200 字文本'}},
+  {label:'输出',dur:100,io:{in:'回复文本',act:'微信纯文本呈现',out:'已发送'}},
 ];
 const traceB=[
-  {label:'编排 / 分流',dur:32},
-  {label:'context 组装',dur:110},
-  {label:'memory 召回 · topK5 命中3',dur:220,diff:true},
-  {label:'模型调用 · planning',dur:700,diff:true},
-  {label:'工具 · 知识库检索',dur:300},
-  {label:'工具 · 联网搜索（新增）',dur:250,diff:true},
-  {label:'模型调用 · 生成回复 · 300字',dur:520,diff:true},
-  {label:'输出',dur:48},
+  {label:'编排 / 分流',dur:32,io:{in:'用户「请介绍一下你们的智能客服产品」',act:'判定任务类型=T1 即时问答，走单链',out:'路由 → 即时问答'}},
+  {label:'context 组装',dur:110,io:{in:'当前输入 + 近 3 轮 + 端=微信',act:'按 prompt v2 拼装，1.3k tokens',out:'context ready'}},
+  {label:'memory 召回 · topK5 命中3',dur:220,diff:true,io:{in:'query=「产品 介绍」',act:'精确+背景召回 topK5，阈值 0.80（较 A topK↑）',out:'命中 3 条（产品定位、支持渠道、最新定价）'}},
+  {label:'模型调用 · planning',dur:700,diff:true,io:{in:'context + system prompt v2',act:'规划：先联网补最新信息，再检索作答（v2 提示要求给最新）',out:'计划 = 联网 + 检索后作答（较 A 多一步联网）'}},
+  {label:'工具 · 知识库检索',dur:300,io:{in:'q=「智能客服 功能/接入」',act:'查知识库',out:'命中 3 段'}},
+  {label:'工具 · 联网搜索（新增）',dur:250,diff:true,io:{in:'q=「智能客服 2026 最新趋势」',act:'联网搜索（A 无此步）',out:'返回 2 条外部结果'}},
+  {label:'模型调用 · 生成回复 · 300字',dur:520,diff:true,io:{in:'检索+联网结果 + prompt（友好/300字）',act:'生成更详细回复',out:'300 字文本（含 emoji）'}},
+  {label:'输出',dur:48,io:{in:'回复文本',act:'微信纯文本呈现',out:'已发送'}},
 ];
 
 /* ---------------- state ---------------- */
@@ -495,11 +504,19 @@ function waterfall(spans){
   const SCALE=2180; let t=0;
   return spans.map(s=>{
     const left=t/SCALE*100, w=Math.max(s.dur/SCALE*100,1.2); t+=s.dur;
-    return `<div class="tr-span">
-      <div class="tr-name" title="${s.label}">${s.label}</div>
-      <div class="tr-track"><span class="tr-bar ${s.diff?'diff':''}" style="left:${left.toFixed(1)}%;width:${w.toFixed(1)}%"></span></div>
-      <div class="tr-dur">${s.dur}ms</div>
-    </div>`;
+    const io = s.io?`<div class="tr-io">
+        <div><b>输入</b>${s.io.in}</div>
+        <div><b>动作</b>${s.io.act}</div>
+        <div><b>输出</b>${s.io.out}</div>
+      </div>`:'';
+    return `<details class="tr-step${s.diff?' diff':''}">
+      <summary class="tr-sum">
+        <span class="tr-name" title="${s.label}">${s.label}</span>
+        <span class="tr-track"><span class="tr-bar${s.diff?' diff':''}" style="left:${left.toFixed(1)}%;width:${w.toFixed(1)}%"></span></span>
+        <span class="tr-dur">${s.dur}ms</span>
+      </summary>
+      ${io}
+    </details>`;
   }).join('');
 }
 
@@ -527,11 +544,11 @@ function renderCenter(){
     el.innerHTML = `
       <div class="trace-stack">
         <div class="trace-col">
-          <div class="tr-h"><div class="tr-t">A <span class="ab-badge a">基线 v1.2.3</span></div><div class="tr-meta">gpt-5.4 · 7 步 · 总延迟 1.24s · $0.009</div></div>
+          <div class="tr-h"><div class="tr-t">A <span class="ab-badge a">基线 v1.2.3</span></div><div class="tr-meta">hy3 · 7 步 · 总延迟 1.24s · $0.009</div></div>
           <div class="tr-body">${waterfall(traceA)}</div>
         </div>
         <div class="trace-col">
-          <div class="tr-h"><div class="tr-t">B <span class="ab-badge b">实验 v1.3.0</span></div><div class="tr-meta">gpt-5.4 · 8 步 · 总延迟 2.18s · $0.014</div></div>
+          <div class="tr-h"><div class="tr-t">B <span class="ab-badge b">实验 v1.3.0</span></div><div class="tr-meta">hy3 · 8 步 · 总延迟 2.18s · $0.014</div></div>
           <div class="tr-body">${waterfall(traceB)}</div>
         </div>
         <div class="sub" style="margin-top:2px">蓝色 = B 相对 A 变化或新增的步骤（memory topK↑、planning 更慢、新增联网搜索、生成更长）。<a href="#" onclick="toast('跳算法团队 trace 工具看完整 span 明细');return false" style="color:var(--accent-2)">看完整 trace →</a></div>
