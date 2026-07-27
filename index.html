@@ -31,8 +31,11 @@
   .brand{display:flex;align-items:center;gap:10px;padding:20px 16px 16px}
   .brand .logo{width:28px;height:28px;border-radius:8px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:13px;flex:0 0 auto}
   .brand .name{font-weight:600;font-size:15px;letter-spacing:-.01em;white-space:nowrap}
-  .sidebar.collapsed .brand{padding:20px 0 16px;justify-content:center}
+  .nav-toggle-btn{margin-left:auto;width:26px;height:26px;border:0;background:transparent;color:var(--text-3);border-radius:7px;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:0 0 auto}
+  .nav-toggle-btn:hover{background:rgba(0,0,0,.06);color:var(--text)}
+  .sidebar.collapsed .brand{flex-direction:column;gap:10px;padding:18px 0 16px}
   .sidebar.collapsed .brand .name{display:none}
+  .sidebar.collapsed .nav-toggle-btn{margin-left:0}
   .nav{padding:8px 10px;flex:1}
   .nav-item{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:10px;color:var(--text-2);font-weight:400;margin-bottom:2px;user-select:none;transition:.12s;white-space:nowrap;overflow:hidden}
   .nav-item:hover{background:rgba(0,0,0,.035)}
@@ -312,7 +315,8 @@
   <aside class="sidebar">
     <div class="brand">
       <div class="logo">HL</div>
-      <div><span class="name">Harness Lab</span></div>
+      <span class="name">Harness Lab</span>
+      <button class="nav-toggle-btn" id="navToggleBtn" onclick="toggleSidebar()" title="收起 / 展开">«</button>
     </div>
     <nav class="nav" id="nav">
       <div class="nav-item active" data-screen="workbench" title="测试台"><span class="ic">▤</span><span class="nl">测试台</span></div>
@@ -321,7 +325,6 @@
       <div class="nav-item" data-screen="runs" title="版本记录"><span class="ic">≣</span><span class="nl">版本记录</span></div>
       <div class="nav-item" data-screen="settings" title="设置"><span class="ic">⚙</span><span class="nl">设置</span></div>
     </nav>
-    <div class="nav-toggle" onclick="toggleSidebar()" title="收起/展开"><span class="ic" id="navToggleIcon">«</span><span class="nl">收起</span></div>
     <div class="side-foot">环境：<b>测试 sandbox</b><br>Core：<b>opencc v1.2.3</b><br>Model：<b>hy3</b><br><span style="opacity:.8">底座只读 · 算法团队维护</span></div>
   </aside>
 
@@ -876,7 +879,7 @@ document.getElementById('nav').addEventListener('click',e=>{
 function toggleSidebar(){
   const sb=document.querySelector('.sidebar');
   const collapsed=sb.classList.toggle('collapsed');
-  const ic=document.getElementById('navToggleIcon');
+  const ic=document.getElementById('navToggleBtn');
   if(ic) ic.textContent = collapsed ? '»' : '«';
 }
 
