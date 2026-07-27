@@ -658,8 +658,7 @@ let tab = 'interact';
 /* ---------------- render ---------------- */
 function renderModules(){
   const el = document.getElementById('modlist');
-  const ordered = [...modules].sort((a,b)=>(a.changed?0:1)-(b.changed?0:1)); // 改动的置顶，组内保持原序
-  el.innerHTML = ordered.map(m=>`
+  el.innerHTML = modules.map(m=>`
     <div class="mod ${m.changed?'changed':''}">
       <div><div class="mn">${m.name}</div><div class="mt">${m.type}</div></div>
       <div class="mod-r">
