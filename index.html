@@ -252,15 +252,17 @@
                 <button data-client="app">App</button>
               </div>
 
-              <div class="sub">Agent 策略模块 <span style="color:var(--text-3);font-weight:400">（左侧蓝条/● 改=相对基线改过；右侧开关=本版启用/停用）</span></div>
+              <div class="sub">Harness 模块 · 8 类 <span style="color:var(--text-3);font-weight:400">（agent = model + harness；左侧蓝条/● 改=相对基线改过；右侧开关=启用/停用）</span></div>
               <div id="modlist"></div>
               <button class="addbtn" onclick="toast('新增模块：定类型标识 + 配置 schema + 内容（demo）')">+ 添加模块</button>
 
-              <div class="sub" style="margin-top:14px">Agent Core <span class="lock">只读 · 算法团队维护</span></div>
+              <div class="sub" style="margin-top:14px">底座 <span class="lock">只读 · 算法团队维护</span></div>
               <div class="core">
-                <div class="ct">引擎 / 模型</div>
-                <div class="cn">opencc v1.2.3 · gpt-4.1</div>
-                <div style="margin-top:6px"><span class="running"><span class="dot"></span>运行中</span></div>
+                <div class="ct">Model</div>
+                <div class="cn">gpt-4.1</div>
+                <div class="ct" style="margin-top:9px">Harness Runtime（引擎）</div>
+                <div class="cn">opencc v1.2.3 <span class="running" style="margin-left:6px"><span class="dot"></span>运行中</span></div>
+                <div style="margin-top:9px;font-size:10.5px;color:var(--text-3)">agent = model + harness；上方 8 个模块 = 可调 harness</div>
               </div>
             </div>
           </div>
@@ -296,13 +298,13 @@
         <div class="card2">
           <div style="font-weight:600;margin-bottom:10px">diff：v1.2.3 → v1.3.0</div>
           <div class="diffbox">
-<span class="ctx">module: memory_context</span><br>
+<span class="ctx">module: Prompt / 人设 (system_prompt)</span><br>
+<span class="del">- template: v1</span><br>
+<span class="add">+ template: v2</span><br>
+<span class="ctx">module: Memory / 记忆 (memory)</span><br>
 <span class="del">- recall.topK: 3</span><br>
 <span class="add">+ recall.topK: 5</span><br>
-<span class="ctx">module: system_prompt</span><br>
-<span class="del">- template: summary_v1.tpl</span><br>
-<span class="add">+ template: summary_v2.tpl</span><br>
-<span class="ctx">module: 消息分组</span><br>
+<span class="ctx">module: Hooks / 扩展 (hooks · 消息分组)</span><br>
 <span class="del">- enabled: true</span><br>
 <span class="add">+ enabled: false</span>
           </div>
@@ -372,10 +374,14 @@
 <script>
 /* ---------------- mock data ---------------- */
 const modules = [
-  {id:'persona', name:'人设 (System prompt)', type:'system_prompt', on:true, changed:true},
-  {id:'summary', name:'summary (输出摘要)', type:'output', on:true, changed:false},
-  {id:'group',   name:'消息分组',            type:'hook',   on:false, changed:true},
-  {id:'mem',     name:'Memory / context',   type:'memory_context', on:true, changed:true},
+  {id:'prompt',  name:'Prompt / 人设',        type:'system_prompt', on:true,  changed:true},
+  {id:'context', name:'Context / 上下文',      type:'context',       on:true,  changed:false},
+  {id:'memory',  name:'Memory / 记忆',        type:'memory',        on:true,  changed:true},
+  {id:'tools',   name:'Tools / 工具',         type:'toolset',       on:true,  changed:false},
+  {id:'orch',    name:'Orchestration / 编排', type:'orchestration', on:true,  changed:false},
+  {id:'output',  name:'Output / 输出呈现',    type:'output',        on:true,  changed:false},
+  {id:'guard',   name:'Guardrails / 护栏',    type:'guardrails',    on:true,  changed:false},
+  {id:'hooks',   name:'Hooks / 扩展',         type:'hooks',         on:false, changed:true},
 ];
 
 const convA = [
