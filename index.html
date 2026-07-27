@@ -26,17 +26,28 @@
   .app{display:flex;height:100vh;overflow:hidden}
 
   /* ---------- sidebar ---------- */
-  .sidebar{width:216px;flex:0 0 216px;background:rgba(255,255,255,.72);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-right:1px solid var(--border-2);display:flex;flex-direction:column}
-  .brand{display:flex;align-items:center;gap:10px;padding:22px 20px 18px}
-  .brand .logo{width:28px;height:28px;border-radius:8px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:13px}
-  .brand .name{font-weight:600;font-size:16px;letter-spacing:-.01em}
-  .nav{padding:8px 12px;flex:1}
-  .nav-item{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:10px;color:var(--text-2);font-weight:400;margin-bottom:2px;user-select:none;transition:.12s}
+  .sidebar{width:184px;flex:0 0 184px;background:rgba(255,255,255,.72);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-right:1px solid var(--border-2);display:flex;flex-direction:column;transition:width .18s ease,flex-basis .18s ease}
+  .sidebar.collapsed{width:60px;flex:0 0 60px}
+  .brand{display:flex;align-items:center;gap:10px;padding:20px 16px 16px}
+  .brand .logo{width:28px;height:28px;border-radius:8px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:13px;flex:0 0 auto}
+  .brand .name{font-weight:600;font-size:15px;letter-spacing:-.01em;white-space:nowrap}
+  .sidebar.collapsed .brand{padding:20px 0 16px;justify-content:center}
+  .sidebar.collapsed .brand .name{display:none}
+  .nav{padding:8px 10px;flex:1}
+  .nav-item{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:10px;color:var(--text-2);font-weight:400;margin-bottom:2px;user-select:none;transition:.12s;white-space:nowrap;overflow:hidden}
   .nav-item:hover{background:rgba(0,0,0,.035)}
   .nav-item.active{background:var(--accent-soft);color:var(--accent-2);font-weight:500}
-  .nav-item .ic{width:16px;text-align:center;opacity:.7}
-  .side-foot{padding:16px 20px;border-top:1px solid var(--border-2);font-size:11.5px;color:var(--text-3)}
+  .nav-item .ic{width:16px;text-align:center;opacity:.7;flex:0 0 auto}
+  .sidebar.collapsed .nav-item{justify-content:center;padding:9px 0}
+  .sidebar.collapsed .nav-item .nl{display:none}
+  .nav-toggle{display:flex;align-items:center;gap:11px;padding:9px 11px;margin:0 10px 8px;border-radius:10px;color:var(--text-3);cursor:pointer;font-size:12.5px;user-select:none}
+  .nav-toggle:hover{background:rgba(0,0,0,.035)}
+  .sidebar.collapsed .nav-toggle{justify-content:center;padding:9px 0}
+  .sidebar.collapsed .nav-toggle .nl{display:none}
+  .nav-toggle .ic{width:16px;text-align:center;flex:0 0 auto}
+  .side-foot{padding:16px 18px;border-top:1px solid var(--border-2);font-size:11.5px;color:var(--text-3)}
   .side-foot b{color:var(--text-2);font-weight:500}
+  .sidebar.collapsed .side-foot{display:none}
 
   /* ---------- main ---------- */
   .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
@@ -300,12 +311,13 @@
       <div><span class="name">Harness Lab</span></div>
     </div>
     <nav class="nav" id="nav">
-      <div class="nav-item active" data-screen="workbench"><span class="ic">▤</span>测试台</div>
-      <div class="nav-item" data-screen="strategy"><span class="ic">⑃</span>策略库</div>
-      <div class="nav-item" data-screen="cases"><span class="ic">▦</span>Case 库</div>
-      <div class="nav-item" data-screen="runs"><span class="ic">≣</span>版本记录</div>
-      <div class="nav-item" data-screen="settings"><span class="ic">⚙</span>设置</div>
+      <div class="nav-item active" data-screen="workbench" title="测试台"><span class="ic">▤</span><span class="nl">测试台</span></div>
+      <div class="nav-item" data-screen="strategy" title="策略库"><span class="ic">⑃</span><span class="nl">策略库</span></div>
+      <div class="nav-item" data-screen="cases" title="Case 库"><span class="ic">▦</span><span class="nl">Case 库</span></div>
+      <div class="nav-item" data-screen="runs" title="版本记录"><span class="ic">≣</span><span class="nl">版本记录</span></div>
+      <div class="nav-item" data-screen="settings" title="设置"><span class="ic">⚙</span><span class="nl">设置</span></div>
     </nav>
+    <div class="nav-toggle" onclick="toggleSidebar()" title="收起/展开"><span class="ic" id="navToggleIcon">«</span><span class="nl">收起</span></div>
     <div class="side-foot">环境：<b>测试 sandbox</b><br>Core：<b>opencc v1.2.3</b><br>Model：<b>hy3</b><br><span style="opacity:.8">底座只读 · 算法团队维护</span></div>
   </aside>
 
@@ -865,6 +877,13 @@ document.getElementById('nav').addEventListener('click',e=>{
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('screen-'+it.dataset.screen).classList.add('active');
 });
+
+function toggleSidebar(){
+  const sb=document.querySelector('.sidebar');
+  const collapsed=sb.classList.toggle('collapsed');
+  const ic=document.getElementById('navToggleIcon');
+  if(ic) ic.textContent = collapsed ? '»' : '«';
+}
 
 let toastTimer;
 function toast(msg){
