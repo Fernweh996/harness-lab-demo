@@ -40,8 +40,6 @@
 
   /* ---------- main ---------- */
   .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
-  .demobar{background:rgba(255,255,255,.6);backdrop-filter:blur(12px);color:var(--text-3);font-size:11.5px;padding:7px 20px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-2)}
-  .demobar b{color:var(--text-2);font-weight:500}
   .screen{flex:1;overflow:auto;display:none}
   .screen.active{display:flex;flex-direction:column}
 
@@ -248,8 +246,6 @@
 
   <!-- MAIN -->
   <div class="main">
-    <div class="demobar"><span>Harness Lab · P0 演示原型</span><span><b>MOCK 数据</b> · 仅用于团队对齐讨论，非真实运行结果</span></div>
-
     <!-- ============ WORKBENCH ============ -->
     <section class="screen active" id="screen-workbench">
       <div class="wb-top">
@@ -262,7 +258,7 @@
         <button class="btn primary" id="runBtn" disabled>开始运行</button>
         <div class="spacer"></div>
         <span class="running"><span class="dot"></span>对比跑 运行中</span>
-        <button class="btn" onclick="toast('对比跑已重新触发（demo）')">重跑</button>
+        <button class="btn" onclick="toast('对比跑已重新触发')">重跑</button>
       </div>
 
       <div class="wb-main">
@@ -279,7 +275,7 @@
 
               <div class="sub">Harness 模块 <span style="color:var(--text-3);font-weight:400">（agent = model + harness；Orchestration 暂由算法团队设计，不在此调）</span></div>
               <div id="modlist"></div>
-              <button class="addbtn" onclick="toast('新增模块：定类型标识 + 配置 schema + 内容（demo）')">+ 添加模块</button>
+              <button class="addbtn" onclick="toast('新增模块：定类型标识 + 配置 schema + 内容')">+ 添加模块</button>
 
               <div class="sub" style="margin-top:14px">底座 <span class="lock">只读 · 算法团队维护</span></div>
               <div class="core">
@@ -301,8 +297,8 @@
             <div class="tab" data-tab="metrics">指标对比</div>
             <div class="tab" data-tab="eval">效果评估</div>
             <div class="spacer"></div>
-            <button class="btn ghost" onclick="toast('带 run/trace id 跳转算法团队 trace 工具（demo）')">看轨迹 →</button>
-            <button class="btn primary" onclick="toast('已把实验版 v1.3.0 存入策略库（demo）')">存为新版本到策略库</button>
+            <button class="btn ghost" onclick="toast('带 run/trace id 跳转算法团队 trace 工具')">看轨迹 →</button>
+            <button class="btn primary" onclick="toast('已把实验版 v1.3.0 存入策略库')">存为新版本到策略库</button>
           </div>
           <div class="eval-body">
             <div class="col-center" id="centerpane"></div>
@@ -381,10 +377,10 @@
           <table>
             <thead><tr><th>Run</th><th>Bundle</th><th>Case</th><th>端</th><th>状态</th><th class="num">延迟</th><th class="num">成本</th><th></th></tr></thead>
             <tbody>
-              <tr><td>#2041</td><td>v1.3.0</td><td>#001</td><td>App</td><td><span class="ok-badge">成功</span></td><td class="num">2.18s</td><td class="num">$0.014</td><td><a href="#" onclick="toast('跳算法 trace 工具（demo）');return false" style="color:var(--accent-2)">看轨迹</a></td></tr>
-              <tr><td>#2040</td><td>v1.2.3</td><td>#001</td><td>App</td><td><span class="ok-badge">成功</span></td><td class="num">1.24s</td><td class="num">$0.009</td><td><a href="#" onclick="toast('跳算法 trace 工具（demo）');return false" style="color:var(--accent-2)">看轨迹</a></td></tr>
-              <tr><td>#2039</td><td>v1.3.0</td><td>#001</td><td>微信</td><td><span class="ok-badge">成功</span></td><td class="num">1.92s</td><td class="num">$0.012</td><td><a href="#" onclick="toast('跳算法 trace 工具（demo）');return false" style="color:var(--accent-2)">看轨迹</a></td></tr>
-              <tr><td>#2038</td><td>v1.2.3</td><td>#001</td><td>微信</td><td><span class="ok-badge">成功</span></td><td class="num">1.10s</td><td class="num">$0.008</td><td><a href="#" onclick="toast('跳算法 trace 工具（demo）');return false" style="color:var(--accent-2)">看轨迹</a></td></tr>
+              <tr><td>#2041</td><td>v1.3.0</td><td>#001</td><td>App</td><td><span class="ok-badge">成功</span></td><td class="num">2.18s</td><td class="num">$0.014</td><td><a href="#" onclick="toast('跳算法 trace 工具');return false" style="color:var(--accent-2)">看轨迹</a></td></tr>
+              <tr><td>#2040</td><td>v1.2.3</td><td>#001</td><td>App</td><td><span class="ok-badge">成功</span></td><td class="num">1.24s</td><td class="num">$0.009</td><td><a href="#" onclick="toast('跳算法 trace 工具');return false" style="color:var(--accent-2)">看轨迹</a></td></tr>
+              <tr><td>#2039</td><td>v1.3.0</td><td>#001</td><td>微信</td><td><span class="ok-badge">成功</span></td><td class="num">1.92s</td><td class="num">$0.012</td><td><a href="#" onclick="toast('跳算法 trace 工具');return false" style="color:var(--accent-2)">看轨迹</a></td></tr>
+              <tr><td>#2038</td><td>v1.2.3</td><td>#001</td><td>微信</td><td><span class="ok-badge">成功</span></td><td class="num">1.10s</td><td class="num">$0.008</td><td><a href="#" onclick="toast('跳算法 trace 工具');return false" style="color:var(--accent-2)">看轨迹</a></td></tr>
             </tbody>
           </table>
         </div>
@@ -549,7 +545,7 @@ function renderCenter(){
           <div class="tr-h"><div class="tr-t">B <span class="ab-badge b">实验 v1.3.0</span></div><div class="tr-meta">gpt-5.4 · 8 步 · 总延迟 2.18s · $0.014</div></div>
           <div class="tr-body">${waterfall(traceB)}</div>
         </div>
-        <div class="sub" style="margin-top:2px">蓝色 = B 相对 A 变化或新增的步骤（memory topK↑、planning 更慢、新增联网搜索、生成更长）。<a href="#" onclick="toast('跳算法团队 trace 工具看完整 span 明细（demo）');return false" style="color:var(--accent-2)">看完整 trace →</a></div>
+        <div class="sub" style="margin-top:2px">蓝色 = B 相对 A 变化或新增的步骤（memory topK↑、planning 更慢、新增联网搜索、生成更长）。<a href="#" onclick="toast('跳算法团队 trace 工具看完整 span 明细');return false" style="color:var(--accent-2)">看完整 trace →</a></div>
       </div>`;
   } else if(tab==='metrics'){
     const rows = metrics.map(m=>`
@@ -575,8 +571,8 @@ function renderCenter(){
           <ul class="worse-list">
             <li><span>延迟 P50</span><span class="delta bad">▼ +0.94s</span></li>
             <li><span>成本 (Token)</span><span class="delta bad">▼ +378</span></li>
-            <li><span>case #005 长内容产出 · 延迟</span><span><span class="delta bad">▼ +1.4s</span> <a href="#" onclick="toast('跳算法 trace 工具（demo）');return false" style="color:var(--accent-2);margin-left:8px">看轨迹→</a></span></li>
-            <li><span>case #002 订票确认 · 成本</span><span><span class="delta bad">▼ +$0.01</span> <a href="#" onclick="toast('跳算法 trace 工具（demo）');return false" style="color:var(--accent-2);margin-left:8px">看轨迹→</a></span></li>
+            <li><span>case #005 长内容产出 · 延迟</span><span><span class="delta bad">▼ +1.4s</span> <a href="#" onclick="toast('跳算法 trace 工具');return false" style="color:var(--accent-2);margin-left:8px">看轨迹→</a></span></li>
+            <li><span>case #002 订票确认 · 成本</span><span><span class="delta bad">▼ +$0.01</span> <a href="#" onclick="toast('跳算法 trace 工具');return false" style="color:var(--accent-2);margin-left:8px">看轨迹→</a></span></li>
           </ul>
           <div class="sub" style="margin-top:10px">结论：B 质量和命中率更好，但成本和延迟是代价——是否值得由团队定。</div>
         </div>
@@ -592,7 +588,7 @@ function renderCenter(){
             <div class="score-row"><span>是否守分寸</span><span class="radio"><span class="on">● 是</span><span>○ 否</span></span></div>
             <div class="score-row"><span>是否越红线</span><span class="radio"><span>○ 是</span><span class="on">● 否</span></span></div>
             <div class="score-row"><span>行为符合期望</span><span class="radio"><span class="on">● 是</span><span>○ 否</span></span></div>
-            <div style="margin-top:12px"><button class="btn primary" onclick="toast('已提交评分，进入下一条（demo）')">提交并下一条</button></div>
+            <div style="margin-top:12px"><button class="btn primary" onclick="toast('已提交评分，进入下一条')">提交并下一条</button></div>
           </div>
         </div>
         <div class="panel">
@@ -617,7 +613,7 @@ function renderRail(){
         <div class="mv">${m.a}<span class="mb">→ ${m.b}</span></div>
         <span class="delta ${m.dir}">${arrow(m.dir)} ${m.delta}</span>
       </div>
-      ${m.src==='人评'?`<div class="hi"><input class="hi-in" type="number" min="1" max="5" step="0.1" placeholder="输入人评分 1–5"><button class="hi-btn" onclick="toast('已记录人工评分（demo）')">记录</button></div>`:''}
+      ${m.src==='人评'?`<div class="hi"><input class="hi-in" type="number" min="1" max="5" step="0.1" placeholder="输入人评分 1–5"><button class="hi-btn" onclick="toast('已记录人工评分')">记录</button></div>`:''}
     </div>`).join('') + '<div class="sub" style="margin:10px 0 0">人评=含人工评分，其余为自动评测；完整 7 项见「指标对比」</div>';
 }
 
