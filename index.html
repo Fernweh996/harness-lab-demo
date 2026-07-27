@@ -56,7 +56,8 @@
   .btn.ghost{border-color:transparent;background:transparent;color:var(--accent-2)}
   .btn.ghost:hover{background:var(--accent-soft)}
   .btn:disabled{opacity:.38;cursor:not-allowed}
-  .btn:disabled:hover{background:var(--accent)}
+  .btn.stop{background:#fff;border-color:var(--bad);color:var(--bad)}
+  .btn.stop:hover{background:var(--bad-soft)}
   .spacer{flex:1}
   .running{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--good);font-weight:500}
   .dot{width:7px;height:7px;border-radius:50%;background:var(--good);box-shadow:0 0 0 0 rgba(52,199,89,.5);animation:pulse 1.6s infinite}
@@ -260,8 +261,8 @@
         </div>
         <button class="btn primary" id="runBtn" disabled>开始运行</button>
         <div class="spacer"></div>
-        <span class="running"><span class="dot"></span>对比跑 运行中</span>
-        <button class="btn" onclick="toast('对比跑已重新触发')">重跑</button>
+        <span class="running" id="runIndicator" style="display:none"><span class="dot"></span>对比跑 运行中</span>
+        <button class="btn" onclick="startRun()">重跑</button>
       </div>
 
       <div class="wb-main">
@@ -637,23 +638,47 @@ function toast(msg){
   clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),2200);
 }
 
-/* run button: 换 case 后可点“开始运行”，结果出来后置灰 */
+/* run 状态机：开始运行 → 停止运行(可中断) → 结果出置灰；换 case 可重新开始 */
 const caseSel=document.getElementById('caseSel');
 const runBtn=document.getElementById('runBtn');
-caseSel.addEventListener('change',()=>{
-  runBtn.disabled=false; runBtn.textContent='开始运行';
-  toast('已切换到新 case，点“开始运行”跑一遍');
-});
-runBtn.addEventListener('click',()=>{
-  if(runBtn.disabled) return;
-  runBtn.disabled=true; runBtn.textContent='运行中…';
+const runIndicator=document.getElementById('runIndicator');
+let running=false, runTimer=null;
+
+function startRun(){
+  if(running) return;
+  running=true;
+  runBtn.disabled=false; runBtn.textContent='停止运行';
+  runBtn.classList.remove('primary'); runBtn.classList.add('stop');
+  if(runIndicator) runIndicator.style.display='';
   toast('对比跑运行中…');
-  setTimeout(()=>{
-    renderCenter(); renderRail();      // 结果刷新（demo 用同一批 mock）
-    runBtn.textContent='开始运行';
-    runBtn.disabled=true;              // 结果已出 → 置灰，直到再次切换 case
-    toast('运行完成，结果已更新');
-  },1200);
+  runTimer=setTimeout(finishRun,2200);
+}
+function stopRun(){
+  if(!running) return;
+  clearTimeout(runTimer); running=false;
+  runBtn.classList.remove('stop'); runBtn.classList.add('primary');
+  runBtn.textContent='开始运行'; runBtn.disabled=false;   // 中断后可重跑
+  if(runIndicator) runIndicator.style.display='none';
+  toast('已停止运行');
+}
+function finishRun(){
+  running=false;
+  runBtn.classList.remove('stop'); runBtn.classList.add('primary');
+  runBtn.textContent='开始运行'; runBtn.disabled=true;    // 结果已出 → 置灰，直到再换 case
+  if(runIndicator) runIndicator.style.display='none';
+  renderCenter(); renderRail();
+  toast('运行完成，结果已更新');
+}
+runBtn.addEventListener('click',()=>{
+  if(running){ stopRun(); return; }
+  if(runBtn.disabled) return;
+  startRun();
+});
+caseSel.addEventListener('change',()=>{
+  if(running) stopRun();
+  runBtn.disabled=false; runBtn.textContent='开始运行';
+  runBtn.classList.remove('stop'); runBtn.classList.add('primary');
+  toast('已切换到新 case，点“开始运行”跑一遍');
 });
 
 /* init */
