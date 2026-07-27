@@ -317,17 +317,20 @@
         <p class="lead">单 case + case set 两级，带期望值标注。想守住的一组打标当"常跑集"。（mock）</p>
         <div class="card2" style="padding:0;overflow:hidden">
           <table>
-            <thead><tr><th>ID</th><th>标题</th><th>标签</th><th>期望行为</th><th>端</th></tr></thead>
+            <thead><tr><th>ID</th><th>标题</th><th>任务类型</th><th>期望行为（对齐策略文档）</th></tr></thead>
             <tbody>
-              <tr><td>#001</td><td>客户咨询_产品介绍</td><td><span class="chip">咨询</span></td><td>即时问答 · 引用知识库</td><td>微信 / App</td></tr>
-              <tr><td>#002</td><td>对外动作_订票确认</td><td><span class="chip">高风险</span></td><td>触发确认门 ✓</td><td>App</td></tr>
-              <tr><td>#003</td><td>记忆冲突_地址更新</td><td><span class="chip">记忆</span></td><td>以最新陈述为准</td><td>微信</td></tr>
-              <tr><td>#004</td><td>主动消息_频控</td><td><span class="chip">主动</span></td><td>低频 · 可忽略</td><td>App</td></tr>
-              <tr><td>#005</td><td>长内容_调研产出</td><td><span class="chip">产出</span></td><td>走产物页</td><td>App</td></tr>
+              <tr><td>#001</td><td>即时问答_查资料</td><td><span class="chip">T1 即时问答</span></td><td>结论先行，短回复不堆结构</td></tr>
+              <tr><td>#002</td><td>信息收藏_发文章说"存一下"</td><td><span class="chip">T2 信息收藏</span></td><td>保存并回执，之后可找回</td></tr>
+              <tr><td>#003</td><td>对外动作_订机票</td><td><span class="chip">T7 对外动作</span></td><td>先出草稿/摘要，走确认门</td></tr>
+              <tr><td>#004</td><td>调研产出_写报告</td><td><span class="chip">T6 调研产出</span></td><td>长内容走产物页 / H5</td></tr>
+              <tr><td>#005</td><td>记忆冲突_地址更新</td><td><span class="chip">记忆</span></td><td>以最新明确陈述为准</td></tr>
+              <tr><td>#006</td><td>主动消息_老用户冷启</td><td><span class="chip">主动消息</span></td><td>P0 先播任务状态，最多 3 条</td></tr>
+              <tr><td>#007</td><td>能力外请求_异常兜底</td><td><span class="chip">兜底</span></td><td>如实说明+给降级方案，不伪造成功</td></tr>
+              <tr><td>#008</td><td>首次进入_打招呼</td><td><span class="chip">冷启</span></td><td>不装熟、不罗列能力清单</td></tr>
             </tbody>
           </table>
         </div>
-        <div class="card2"><b>常跑集：客户咨询回归 (8)</b> — 对比时默认带上，暂不做门禁拦截。</div>
+        <div class="card2"><b>常跑集：对外动作确认门 (8)</b> — 高风险场景,对比时默认带上,暂不做门禁拦截。</div>
       </div>
     </section>
 
