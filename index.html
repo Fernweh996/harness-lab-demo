@@ -9,7 +9,7 @@
   :root{
     --bg:#f5f5f7; --surface:#ffffff; --surface-2:#f5f5f7;
     --text:#1d1d1f; --text-2:#6e6e73; --text-3:#a1a1a6;
-    --accent:#0071e3; --accent-soft:rgba(0,113,227,.10); --accent-2:#0071e3;
+    --accent:#1d1d1f; --accent-soft:rgba(0,0,0,.06); --accent-2:#1d1d1f;
     --border:rgba(0,0,0,.09); --border-2:rgba(0,0,0,.055);
     --good:#34c759; --good-soft:rgba(52,199,89,.14); --bad:#ff3b30; --bad-soft:rgba(255,59,48,.12); --flat:#a1a1a6;
     --wx-bg:#ededed; --wx-green:#95ec69; --shadow:0 1px 2px rgba(0,0,0,.04),0 12px 32px rgba(0,0,0,.05);
@@ -53,7 +53,7 @@
   .btn{border:1px solid var(--border);background:var(--surface);border-radius:980px;padding:7px 16px;font-size:12.5px;color:var(--text);font-weight:500;transition:.12s}
   .btn:hover{background:var(--surface-2)}
   .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
-  .btn.primary:hover{filter:brightness(1.05)}
+  .btn.primary:hover{background:#363636}
   .btn.ghost{border-color:transparent;background:transparent;color:var(--accent-2)}
   .btn.ghost:hover{background:var(--accent-soft)}
   .spacer{flex:1}
@@ -92,7 +92,7 @@
   .mod.changed .mn::after{content:"● 改";color:var(--accent);margin-left:6px;font-size:9.5px;vertical-align:middle;font-weight:600}
   .sw{width:42px;height:25px;border-radius:25px;background:#e9e9ea;position:relative;transition:.2s cubic-bezier(.4,0,.2,1);border:0;flex:0 0 auto}
   .sw::after{content:"";position:absolute;width:21px;height:21px;border-radius:50%;background:#fff;top:2px;left:2px;transition:.2s cubic-bezier(.4,0,.2,1);box-shadow:0 1px 3px rgba(0,0,0,.2)}
-  .sw.on{background:var(--good)}
+  .sw.on{background:var(--accent)}
   .sw.on::after{left:19px}
   .addbtn{width:100%;border:1px dashed var(--border);background:transparent;border-radius:12px;padding:9px;color:var(--text-2);font-size:12.5px;transition:.12s}
   .addbtn:hover{border-color:var(--accent);color:var(--accent-2);background:var(--accent-soft)}
@@ -186,7 +186,7 @@
   .tagx{font-size:10.5px;border-radius:7px;padding:2px 8px;font-weight:600}
   .tagx.base{background:rgba(118,118,128,.12);color:var(--text-2)}
   .tagx.exp{background:var(--accent-soft);color:var(--accent-2)}
-  .tagx.cand{background:rgba(255,159,10,.15);color:#c2740a}
+  .tagx.cand{background:var(--accent);color:#fff}
   .diffbox{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;background:#1d1d1f;color:#e8e8ed;border-radius:14px;padding:16px;line-height:1.8}
   .diffbox .add{color:#63e6a0}
   .diffbox .del{color:#ff8a80}
