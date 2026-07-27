@@ -106,6 +106,36 @@
   .tr-io{margin:0 0 10px 16px;padding:8px 12px;border-left:2px solid var(--border-2);background:var(--surface-2);border-radius:0 8px 8px 0;font-size:11.5px;color:var(--text-2);display:flex;flex-direction:column;gap:5px}
   .tr-io b{display:inline-block;width:34px;color:var(--text-3);font-weight:500;margin-right:8px;vertical-align:top}
   .tr-step.diff .tr-io{border-left-color:var(--blue)}
+  /* 模块版本下拉 + 改前后 */
+  .mod-r{display:flex;align-items:center;gap:6px}
+  .mod-ver{font-size:11px;border:1px solid var(--border);border-radius:8px;padding:4px 6px;background:#fff;color:var(--text);font-family:inherit}
+  .mod-diff{font-size:10.5px;color:var(--blue);cursor:pointer;white-space:nowrap}
+  .mod-diff:hover{text-decoration:underline}
+  /* 交互对话流（不分端） */
+  .chat{flex:1;display:flex;flex-direction:column;min-height:360px;background:var(--surface);border:1px solid var(--border-2);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+  .chat-body{flex:1;overflow:auto;padding:14px;display:flex;flex-direction:column;gap:12px}
+  .cmsg{display:flex;max-width:92%}
+  .cmsg.user{align-self:flex-end}
+  .cb{background:var(--surface-2);border:1px solid var(--border-2);border-radius:12px;padding:9px 12px;font-size:12.5px;line-height:1.55;color:var(--text)}
+  .cmsg.user .cb{background:var(--accent-soft);border-color:transparent}
+  .cb-act{margin-top:8px;display:flex;gap:6px}
+  .cb-btn{border:1px solid var(--border);background:#fff;border-radius:7px;padding:2px 9px;font-size:11px;color:var(--text-2)}
+  .cb-btn.good:hover{border-color:var(--good);color:var(--good)}
+  .cb-btn.bad:hover{border-color:var(--bad);color:var(--bad)}
+  .chat-in{border-top:1px solid var(--border-2);padding:9px 12px;display:flex;gap:8px;align-items:center;color:var(--text-3);font-size:12px}
+  .chat-in .chat-snd{margin-left:auto;background:var(--good);color:#fff;border:0;border-radius:8px;padding:5px 13px;font-size:12px;font-weight:600}
+  /* 推理链路（横向） */
+  .chain-wrap{display:flex;flex-direction:column;gap:16px}
+  .chain-row{background:var(--surface);border:1px solid var(--border-2);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 16px}
+  .chain-head{font-weight:600;font-size:13px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+  .chain{display:flex;align-items:stretch;overflow-x:auto;padding-bottom:4px}
+  .ch-node{flex:0 0 auto;min-width:104px;max-width:160px;border:1px solid var(--border);border-radius:12px;padding:9px 11px;background:var(--surface)}
+  .ch-node.diff{border-color:var(--blue);background:var(--accent-soft)}
+  .ch-l{font-weight:600;font-size:12px;color:var(--text)}
+  .ch-node.diff .ch-l{color:var(--accent-2)}
+  .ch-s{font-size:10.5px;color:var(--text-3);margin-top:3px;line-height:1.4}
+  .ch-d{font-size:10px;color:var(--text-3);margin-top:5px;font-variant-numeric:tabular-nums}
+  .ch-arrow{flex:0 0 auto;align-self:center;color:var(--text-3);padding:0 8px;font-size:14px}
   .panel{background:var(--surface);border:1px solid var(--border-2);border-radius:var(--radius);box-shadow:var(--shadow)}
   .panel-h{padding:14px 18px;border-bottom:1px solid var(--border-2);font-weight:600;font-size:13px;letter-spacing:-.01em;display:flex;align-items:center;justify-content:space-between}
   .panel-b{padding:16px 18px}
@@ -273,7 +303,7 @@
       <div class="nav-item active" data-screen="workbench"><span class="ic">▤</span>测试台</div>
       <div class="nav-item" data-screen="strategy"><span class="ic">⑃</span>策略库</div>
       <div class="nav-item" data-screen="cases"><span class="ic">▦</span>Case 库</div>
-      <div class="nav-item" data-screen="runs"><span class="ic">≣</span>运行记录</div>
+      <div class="nav-item" data-screen="runs"><span class="ic">≣</span>版本记录</div>
       <div class="nav-item" data-screen="settings"><span class="ic">⚙</span>设置</div>
     </nav>
     <div class="side-foot">环境：<b>测试 sandbox</b><br>Core：<b>opencc v1.2.3</b><br>Model：<b>hy3</b><br><span style="opacity:.8">底座只读 · 算法团队维护</span></div>
@@ -367,19 +397,19 @@
       </div>
     </section>
 
-    <!-- ============ RUNS ============ -->
+    <!-- ============ VERSION LOG ============ -->
     <section class="screen" id="screen-runs">
       <div class="page">
-        <h2>运行记录</h2>
-        <p class="lead">每次 Run 的流水，历史指标和复现入口。（mock）</p>
+        <h2>版本记录</h2>
+        <p class="lead">历史策略版本日志：谁、什么时间、改了什么。（mock）</p>
         <div class="card2" style="padding:0;overflow:hidden">
           <table>
-            <thead><tr><th>Run</th><th>Bundle</th><th>Case</th><th>端</th><th>状态</th><th class="num">延迟</th><th class="num">成本</th><th></th></tr></thead>
+            <thead><tr><th>版本</th><th>改动模块</th><th>改了什么</th><th>修改人</th><th>时间</th></tr></thead>
             <tbody>
-              <tr><td>#2041</td><td>v1.3.0</td><td>#001</td><td>App</td><td><span class="ok-badge">成功</span></td><td class="num">2.18s</td><td class="num">$0.014</td><td><a href="#" onclick="toast('跳算法 trace 工具');return false" style="color:var(--accent-2)">看轨迹</a></td></tr>
-              <tr><td>#2040</td><td>v1.2.3</td><td>#001</td><td>App</td><td><span class="ok-badge">成功</span></td><td class="num">1.24s</td><td class="num">$0.009</td><td><a href="#" onclick="toast('跳算法 trace 工具');return false" style="color:var(--accent-2)">看轨迹</a></td></tr>
-              <tr><td>#2039</td><td>v1.3.0</td><td>#001</td><td>微信</td><td><span class="ok-badge">成功</span></td><td class="num">1.92s</td><td class="num">$0.012</td><td><a href="#" onclick="toast('跳算法 trace 工具');return false" style="color:var(--accent-2)">看轨迹</a></td></tr>
-              <tr><td>#2038</td><td>v1.2.3</td><td>#001</td><td>微信</td><td><span class="ok-badge">成功</span></td><td class="num">1.10s</td><td class="num">$0.008</td><td><a href="#" onclick="toast('跳算法 trace 工具');return false" style="color:var(--accent-2)">看轨迹</a></td></tr>
+              <tr><td>v1.3.0 <span class="tagx exp">实验</span></td><td>Prompt / Memory / Hooks</td><td>换 prompt v2；memory topK 3→5；关闭消息分组</td><td>小鱼（产品）</td><td>2026-07-27 11:20</td></tr>
+              <tr><td>v1.2.3 <span class="tagx base">基线</span></td><td>Prompt</td><td>调 prompt 模板 v1</td><td>阿哲（算法）</td><td>2026-07-20 15:04</td></tr>
+              <tr><td>v1.2.0</td><td>Memory</td><td>召回阈值 0.85→0.82</td><td>阿哲（算法）</td><td>2026-07-12 10:30</td></tr>
+              <tr><td>v1.0.0</td><td>全部</td><td>初始版本</td><td>算法团队</td><td>2026-06-28 09:00</td></tr>
             </tbody>
           </table>
         </div>
@@ -405,13 +435,13 @@
 <script>
 /* ---------------- mock data ---------------- */
 const modules = [
-  {id:'prompt',  name:'Prompt / 人设',        type:'system_prompt', on:true,  changed:true},
-  {id:'context', name:'Context / 上下文',      type:'context',       on:true,  changed:false},
-  {id:'memory',  name:'Memory / 记忆',        type:'memory',        on:true,  changed:true},
-  {id:'tools',   name:'Tools / 工具',         type:'toolset',       on:true,  changed:false},
-  {id:'output',  name:'Output / 输出呈现',    type:'output',        on:true,  changed:false},
-  {id:'guard',   name:'Guardrails / 护栏',    type:'guardrails',    on:true,  changed:false},
-  {id:'hooks',   name:'Hooks / 扩展',         type:'hooks',         on:false, changed:true},
+  {id:'prompt',  name:'Prompt / 人设',        type:'system_prompt', ver:'v1.3.0', versions:['v1.3.0','v1.2.3','v1.0.0'], changed:true},
+  {id:'context', name:'Context / 上下文',      type:'context',       ver:'v1.2.3', versions:['v1.2.3','v1.0.0'], changed:false},
+  {id:'memory',  name:'Memory / 记忆',        type:'memory',        ver:'v1.3.0', versions:['v1.3.0','v1.2.3'], changed:true},
+  {id:'tools',   name:'Tools / 工具',         type:'toolset',       ver:'v1.2.3', versions:['v1.2.3'], changed:false},
+  {id:'output',  name:'Output / 输出呈现',    type:'output',        ver:'v1.2.3', versions:['v1.2.3'], changed:false},
+  {id:'guard',   name:'Guardrails / 护栏',    type:'guardrails',    ver:'v1.2.3', versions:['v1.2.3'], changed:false},
+  {id:'hooks',   name:'Hooks / 扩展',         type:'hooks',         ver:'v1.3.0', versions:['v1.3.0','v1.2.3'], changed:true},
 ];
 
 const convA = [
@@ -431,36 +461,31 @@ const convB = [
     card:{title:'接入方式 · 灵活多样', items:['Web 网页 / 移动 App','微信公众号 / 小程序','完整 API 文档 + SDK','支持二次开发 💪']}},
 ];
 
-// 7 metrics; dir relative to B vs A (good/bad/flat); src: '人评' 标记含人工评分
+// 第一期客观指标（机评后期）；dir 相对 B vs A（越低越好，B 都更高=变差）
 const metrics = [
-  {name:'回复质量',        a:'3.6', b:'3.9',   delta:'+8%',  dir:'good', src:'人评', rail:true},
-  {name:'任务完成率',      a:'100%',b:'100%',  delta:'0',    dir:'flat', rail:true},
-  {name:'成本 (Token)',    a:'856', b:'1,234', delta:'+44%', dir:'bad',  rail:true},
-  {name:'延迟 P50',        a:'1.24s',b:'2.18s',delta:'+76%', dir:'bad',  rail:true},
-  {name:'对话轮次',        a:'3',   b:'3',     delta:'0',    dir:'flat', rail:false},
-  {name:'memory 命中率',   a:'0.62',b:'0.71',  delta:'+15%', dir:'good', rail:false},
-  {name:'错误率',          a:'8%',  b:'3%',    delta:'-5pp', dir:'good', rail:false},
+  {name:'首字延迟 TTFT', a:'0.6s',  b:'0.9s',  delta:'+50%', dir:'bad', rail:true},
+  {name:'任务完成耗时',  a:'1.24s', b:'2.18s', delta:'+76%', dir:'bad', rail:true},
+  {name:'Token 消耗',    a:'856',   b:'1,234', delta:'+44%', dir:'bad', rail:true},
+  {name:'工具调用数',    a:'1',     b:'2',     delta:'+1',   dir:'bad', rail:true},
 ];
 
-// trace 对比 mock：每步含 输入/动作/输出，可展开；diff=B 相对 A 变化/新增
-const traceA=[
-  {label:'编排 / 分流',dur:30,io:{in:'用户「请介绍一下你们的智能客服产品」',act:'判定任务类型=T1 即时问答，走单链、不拆子任务',out:'路由 → 即时问答'}},
-  {label:'context 组装',dur:90,io:{in:'当前输入 + 近 3 轮 + 端=微信',act:'按 prompt v1 拼装，裁到 1.2k tokens',out:'context ready（纯文本能力）'}},
-  {label:'memory 召回 · 命中2',dur:120,io:{in:'query=「产品 介绍」',act:'精确召回 topK3，阈值 0.82',out:'命中 2 条（产品定位、支持渠道）'}},
-  {label:'模型调用 · planning',dur:500,io:{in:'context + system prompt v1',act:'规划：直接作答 + 检索知识库佐证',out:'计划 = 检索后作答'}},
-  {label:'工具 · 知识库检索',dur:260,io:{in:'q=「智能客服 功能/接入」',act:'查知识库',out:'命中 3 段'}},
-  {label:'模型调用 · 生成回复',dur:140,io:{in:'检索结果 + prompt（专业/200字）',act:'生成简洁回复',out:'200 字文本'}},
-  {label:'输出',dur:100,io:{in:'回复文本',act:'微信纯文本呈现',out:'已发送'}},
+// 轨迹 = 推理链路（横向）：query → agent prompt → 分解 → tool → summary → 给用户；diff=B 相对 A 变化/新增
+const chainA=[
+  {label:'query', sub:'用户输入'},
+  {label:'agent prompt', sub:'system v1', dur:'0.6s'},
+  {label:'分解', sub:'规划：检索后作答'},
+  {label:'tool · 知识库', sub:'搜到 3 段 / 返回命中', dur:'0.26s'},
+  {label:'summary', sub:'汇总检索结果', dur:'0.14s'},
+  {label:'给用户', sub:'200 字回复', dur:'0.1s'},
 ];
-const traceB=[
-  {label:'编排 / 分流',dur:32,io:{in:'用户「请介绍一下你们的智能客服产品」',act:'判定任务类型=T1 即时问答，走单链',out:'路由 → 即时问答'}},
-  {label:'context 组装',dur:110,io:{in:'当前输入 + 近 3 轮 + 端=微信',act:'按 prompt v2 拼装，1.3k tokens',out:'context ready'}},
-  {label:'memory 召回 · topK5 命中3',dur:220,diff:true,io:{in:'query=「产品 介绍」',act:'精确+背景召回 topK5，阈值 0.80（较 A topK↑）',out:'命中 3 条（产品定位、支持渠道、最新定价）'}},
-  {label:'模型调用 · planning',dur:700,diff:true,io:{in:'context + system prompt v2',act:'规划：先联网补最新信息，再检索作答（v2 提示要求给最新）',out:'计划 = 联网 + 检索后作答（较 A 多一步联网）'}},
-  {label:'工具 · 知识库检索',dur:300,io:{in:'q=「智能客服 功能/接入」',act:'查知识库',out:'命中 3 段'}},
-  {label:'工具 · 联网搜索（新增）',dur:250,diff:true,io:{in:'q=「智能客服 2026 最新趋势」',act:'联网搜索（A 无此步）',out:'返回 2 条外部结果'}},
-  {label:'模型调用 · 生成回复 · 300字',dur:520,diff:true,io:{in:'检索+联网结果 + prompt（友好/300字）',act:'生成更详细回复',out:'300 字文本（含 emoji）'}},
-  {label:'输出',dur:48,io:{in:'回复文本',act:'微信纯文本呈现',out:'已发送'}},
+const chainB=[
+  {label:'query', sub:'用户输入'},
+  {label:'agent prompt', sub:'system v2', dur:'0.9s', diff:true},
+  {label:'分解', sub:'规划：先联网再检索', diff:true},
+  {label:'tool · 知识库', sub:'搜到 3 段 / 返回命中', dur:'0.30s'},
+  {label:'tool · 联网', sub:'搜到 2 条 / 新增一步', dur:'0.25s', diff:true},
+  {label:'summary', sub:'汇总 检索+联网', dur:'0.20s', diff:true},
+  {label:'给用户', sub:'300 字回复', dur:'0.52s', diff:true},
 ];
 
 // 策略库 mock：每个模块 = 一份可运行的策略文档
@@ -562,7 +587,19 @@ const strategyModules = [
 ## 降级
 - 能力外如实说明并给替代路径。`},
 ];
+const moduleDiffs = {
+  prompt:[{ctx:'## 风格'},{del:'- 语气统一专业、简洁，200 字以内'},{add:'+ 结论先行，短回复不堆结构'},{add:'+ 语气随关系画像调浓淡（v2）'}],
+  memory:[{ctx:'## 召回'},{del:'- topK = 3，阈值 0.82'},{add:'+ topK = 5，阈值 0.80'},{add:'+ 增加背景召回'}],
+  hooks:[{ctx:'## 消息分组'},{del:'- enabled: true'},{add:'+ enabled: false（本版关闭分组）'}],
+};
 let libSel='prompt', libMode='preview';
+function renderDiff(m){
+  const d=moduleDiffs[m.id];
+  if(!d) return `<div class="sub">与基线一致，本模块无改动。</div>`;
+  return `<div class="sub" style="margin-bottom:8px">${m.name}：当前版本 ${m.version} vs 基线</div><div class="diffbox">`
+    + d.map(x=>x.ctx?`<span class="ctx">${esc(x.ctx)}</span>`:x.del?`<span class="del">${esc(x.del)}</span>`:`<span class="add">${esc(x.add)}</span>`).join('<br>')
+    + `</div>`;
+}
 
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function mdToHtml(md){
@@ -596,15 +633,17 @@ function renderLib(){
       <div class="seg">
         <button class="${libMode==='preview'?'on':''}" onclick="setLibMode('preview')">预览</button>
         <button class="${libMode==='edit'?'on':''}" onclick="setLibMode('edit')">编辑</button>
+        <button class="${libMode==='diff'?'on':''}" onclick="setLibMode('diff')">改前后对比</button>
       </div>
-      <button class="btn" onclick="toast('查看该模块与基线的 diff')">查看 diff</button>
       <button class="btn" onclick="toast('已 fork 出实验分支')">fork</button>
       <button class="btn primary" onclick="toast('已保存为新版本')">保存新版本</button>
     </div>
     <div class="lib-body">
       ${libMode==='preview'
         ? `<div class="doc">${mdToHtml(m.source)}</div>`
-        : `<textarea class="editta" oninput="updateLibSource(this.value)">${esc(m.source)}</textarea>`}
+        : libMode==='edit'
+        ? `<textarea class="editta" oninput="updateLibSource(this.value)">${esc(m.source)}</textarea>`
+        : renderDiff(m)}
     </div>`;
 }
 function selectLib(id){ libSel=id; renderLib(); }
@@ -622,12 +661,26 @@ function renderModules(){
   el.innerHTML = ordered.map(m=>`
     <div class="mod ${m.changed?'changed':''}">
       <div><div class="mn">${m.name}</div><div class="mt">${m.type}</div></div>
-      <button class="sw ${m.on?'on':''}" data-mod="${m.id}" title="启用/停用"></button>
+      <div class="mod-r">
+        <select class="mod-ver" onchange="switchModVer('${m.id}',this.value)">
+          ${m.versions.map(v=>`<option ${v===m.ver?'selected':''}>${v}</option>`).join('')}
+        </select>
+        ${m.changed?`<span class="mod-diff" onclick="openLibDiff('${m.id}')">改前后</span>`:''}
+      </div>
     </div>`).join('');
-  el.querySelectorAll('.sw').forEach(b=>b.onclick=()=>{
-    const m = modules.find(x=>x.id===b.dataset.mod); m.on=!m.on; renderModules();
-    toast((m.on?'启用':'停用')+' 模块：'+m.name+'（模块开关变化也进 diff）');
-  });
+}
+function switchModVer(id,v){
+  const m=modules.find(x=>x.id===id); if(!m) return;
+  m.ver=v; m.changed = (v!==m.versions[m.versions.length-1]); // 非最老(基线)版即视为改动
+  renderModules();
+  toast('切换 '+m.name+' → '+v);
+}
+function openLibDiff(id){
+  libSel=id; libMode='diff';
+  document.querySelectorAll('.nav-item').forEach(x=>x.classList.toggle('active', x.dataset.screen==='strategy'));
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-strategy').classList.add('active');
+  renderLib();
 }
 
 function phone(conv, variant){
@@ -651,58 +704,59 @@ function phone(conv, variant){
   </div>`;
 }
 
-function waterfall(spans){
-  const SCALE=2180; let t=0;
-  return spans.map(s=>{
-    const left=t/SCALE*100, w=Math.max(s.dur/SCALE*100,1.2); t+=s.dur;
-    const io = s.io?`<div class="tr-io">
-        <div><b>输入</b>${s.io.in}</div>
-        <div><b>动作</b>${s.io.act}</div>
-        <div><b>输出</b>${s.io.out}</div>
-      </div>`:'';
-    return `<details class="tr-step${s.diff?' diff':''}">
-      <summary class="tr-sum">
-        <span class="tr-name" title="${s.label}">${s.label}</span>
-        <span class="tr-track"><span class="tr-bar${s.diff?' diff':''}" style="left:${left.toFixed(1)}%;width:${w.toFixed(1)}%"></span></span>
-        <span class="tr-dur">${s.dur}ms</span>
-      </summary>
-      ${io}
-    </details>`;
-  }).join('');
+function renderChain(nodes){
+  return nodes.map((n,i)=>`
+    ${i>0?'<span class="ch-arrow">→</span>':''}
+    <div class="ch-node${n.diff?' diff':''}">
+      <div class="ch-l">${n.label}</div>
+      <div class="ch-s">${n.sub||''}</div>
+      ${n.dur?`<div class="ch-d">${n.dur}</div>`:''}
+    </div>`).join('');
 }
+function chatFlow(conv, tag){
+  let body='';
+  for(const t of conv){
+    if(t.role==='user'){
+      body+=`<div class="cmsg user"><div class="cb">${t.text}</div></div>`;
+    } else {
+      body+=`<div class="cmsg"><div class="cb">${t.text}
+        <div class="cb-act"><button class="cb-btn good" onclick="saveCase('${tag}','good')">👍 存 goodcase</button><button class="cb-btn bad" onclick="saveCase('${tag}','bad')">👎 存 badcase</button></div>
+      </div></div>`;
+    }
+  }
+  return `<div class="chat"><div class="chat-body">${body}</div>
+    <div class="chat-in">输入消息…<button class="chat-snd">发送</button></div></div>`;
+}
+function saveCase(tag,kind){ toast('已存为 '+(kind==='good'?'good':'bad')+'case（query + '+tag+' 版输出）到 Case 库'); }
 
 function renderCenter(){
   const el = document.getElementById('centerpane');
   const mc = document.getElementById('metricsCol'); if(mc) mc.style.display = (tab==='trace')?'none':'';
   if(tab==='interact'){
     el.innerHTML = `<div class="preview-wrap">
-      <div class="preview-bar"><div class="seg">
-        <button class="${client==='wechat'?'on':''}" onclick="setClient('wechat')">微信</button>
-        <button class="${client==='app'?'on':''}" onclick="setClient('app')">App</button>
-      </div></div>
       <div class="ab">
       <div class="ab-col">
         <div class="ab-head"><span class="ab-title">A</span><span class="ab-badge a">基线 v1.2.3</span></div>
-        ${phone(convA,'a')}
+        ${chatFlow(convA,'A')}
       </div>
       <div class="ab-col">
         <div class="ab-head"><span class="ab-title">B</span><span class="ab-badge b">实验 v1.3.0</span></div>
-        ${phone(convB,'b')}
+        ${chatFlow(convB,'B')}
       </div>
       </div>
     </div>`;
   } else if(tab==='trace'){
     el.innerHTML = `
-      <div class="trace-stack">
-        <div class="trace-col">
-          <div class="tr-h"><div class="tr-t">A <span class="ab-badge a">基线 v1.2.3</span></div><div class="tr-meta">hy3 · 7 步 · 总延迟 1.24s · $0.009</div></div>
-          <div class="tr-body">${waterfall(traceA)}</div>
+      <div class="chain-wrap">
+        <div class="chain-row">
+          <div class="chain-head">A <span class="ab-badge a">基线 v1.2.3</span> <span class="muted" style="font-weight:400">hy3 · 总耗时 1.24s</span></div>
+          <div class="chain">${renderChain(chainA)}</div>
         </div>
-        <div class="trace-col">
-          <div class="tr-h"><div class="tr-t">B <span class="ab-badge b">实验 v1.3.0</span></div><div class="tr-meta">hy3 · 8 步 · 总延迟 2.18s · $0.014</div></div>
-          <div class="tr-body">${waterfall(traceB)}</div>
+        <div class="chain-row">
+          <div class="chain-head">B <span class="ab-badge b">实验 v1.3.0</span> <span class="muted" style="font-weight:400">hy3 · 总耗时 2.18s</span></div>
+          <div class="chain">${renderChain(chainB)}</div>
         </div>
-        <div class="sub" style="margin-top:2px">蓝色 = B 相对 A 变化或新增的步骤（memory topK↑、planning 更慢、新增联网搜索、生成更长）。<a href="#" onclick="toast('跳算法团队 trace 工具看完整 span 明细');return false" style="color:var(--accent-2)">看完整 trace →</a></div>
+        <div class="sub" style="margin-top:2px">推理链路：query → agent prompt → 分解 → tool（搜到什么 / 返回什么）→ summary → 给用户。蓝色 = B 相对 A 变化或新增（v2 决定先联网 → 多一步联网搜索、生成更长）。<a href="#" onclick="toast('跳算法团队 trace 工具看完整 span 明细');return false" style="color:var(--accent-2)">看完整 trace →</a></div>
       </div>`;
   } else if(tab==='metrics'){
     const rows = metrics.map(m=>`
@@ -726,35 +780,33 @@ function renderCenter(){
         <div class="panel-h">恶化排序 <span class="muted" style="font-weight:500">B 相对 A 变差的地方</span></div>
         <div class="panel-b">
           <ul class="worse-list">
-            <li><span>延迟 P50</span><span class="delta bad">▼ +0.94s</span></li>
-            <li><span>成本 (Token)</span><span class="delta bad">▼ +378</span></li>
-            <li><span>case #005 长内容产出 · 延迟</span><span><span class="delta bad">▼ +1.4s</span> <a href="#" onclick="toast('跳算法 trace 工具');return false" style="color:var(--accent-2);margin-left:8px">看轨迹→</a></span></li>
-            <li><span>case #002 订票确认 · 成本</span><span><span class="delta bad">▼ +$0.01</span> <a href="#" onclick="toast('跳算法 trace 工具');return false" style="color:var(--accent-2);margin-left:8px">看轨迹→</a></span></li>
+            <li><span>任务完成耗时</span><span class="delta bad">▼ +0.94s</span></li>
+            <li><span>首字延迟 TTFT</span><span class="delta bad">▼ +0.3s</span></li>
+            <li><span>Token 消耗</span><span class="delta bad">▼ +378</span></li>
+            <li><span>工具调用数</span><span class="delta bad">▼ +1（多一次联网）</span></li>
           </ul>
-          <div class="sub" style="margin-top:10px">结论：B 质量和命中率更好，但成本和延迟是代价——是否值得由团队定。</div>
+          <div class="sub" style="margin-top:10px">结论：B 更慢、更贵、多调一次工具；内容是否更好，看交互对话与人工评语（机评后期接入）。</div>
         </div>
       </div>`;
   } else {
     el.innerHTML = `
       <div class="eval-grid">
         <div class="panel">
-          <div class="panel-h">人工评分 <span class="muted" style="font-weight:500">当前 case · B</span></div>
+          <div class="panel-h">人工评价 <span class="muted" style="font-weight:500">当前 case</span></div>
           <div class="panel-b">
-            <div class="sub">盲评模式已开（隐藏是哪版）</div>
-            <div class="score-row"><span>回复质量</span><span class="stars">★★★★<span class="off">★</span></span></div>
+            <div class="score-row"><span>整体倾向</span><span class="radio"><span>○ A 更好</span><span class="on">● B 更好</span><span>○ 相当</span></span></div>
             <div class="score-row"><span>是否守分寸</span><span class="radio"><span class="on">● 是</span><span>○ 否</span></span></div>
             <div class="score-row"><span>是否越红线</span><span class="radio"><span>○ 是</span><span class="on">● 否</span></span></div>
-            <div class="score-row"><span>行为符合期望</span><span class="radio"><span class="on">● 是</span><span>○ 否</span></span></div>
-            <div style="margin-top:12px"><button class="btn primary" onclick="toast('已提交评分，进入下一条')">提交并下一条</button></div>
+            <div class="hi-label" style="margin-top:12px">评语</div>
+            <textarea class="hi-ta" placeholder="主观评价，如：B 更亲和、信息更全，但偏啰嗦、成本涨得多"></textarea>
+            <button class="btn primary hi-full" onclick="toast('已提交人工评价')">提交评价</button>
           </div>
         </div>
         <div class="panel">
-          <div class="panel-h">自动评测</div>
+          <div class="panel-h">机评 <span class="muted" style="font-weight:500">后期接入</span></div>
           <div class="panel-b">
-            <div class="score-row"><span>LLM judge · 质量</span><span><b>A 3.6</b> → <b style="color:var(--good)">B 3.9</b></span></div>
-            <div class="score-row"><span>规则指标</span><span class="ok-badge">全通过</span></div>
-            <div class="score-row"><span>自动↔人工 一致性</span><span>0.78 <span class="ok-badge">达标</span></span></div>
-            <div class="judge"><b>judge 理由（B）：</b>回复更完整、语气亲和，覆盖了接入方式细节；扣分点是略偏长，信息密度低于 A。</div>
+            <div class="sub">LLM-as-judge 自动质量评分将在二期接入。</div>
+            <div class="judge">第一期只做客观指标（TTFT / 任务完成耗时 / Token / 工具调用数）+ 人工评价；机评（评审模型 gpt-5.5）二期再上，用于扩大评测规模、和人评做一致性校准。</div>
           </div>
         </div>
       </div>`;
@@ -765,13 +817,13 @@ function renderRail(){
   const el = document.getElementById('metricrail');
   el.innerHTML = metrics.filter(m=>m.rail).map(m=>`
     <div class="metric">
-      <div class="mname">${m.name}${m.src?'<span class="mtag">'+m.src+'</span>':''}</div>
+      <div class="mname">${m.name}</div>
       <div class="mrow">
         <div class="mv">${m.a}<span class="mb">→ ${m.b}</span></div>
         <span class="delta ${m.dir}">${arrow(m.dir)} ${m.delta}</span>
       </div>
     </div>`).join('')
-    + `<div class="sub" style="margin:10px 0 0">人评=含人工评分，其余为自动评测；完整 7 项见「指标对比」</div>`
+    + `<div class="sub" style="margin:10px 0 0">第一期客观指标；机评（LLM 打分）后期接入</div>`
     + `<div class="hi-note">
         <div class="hi-label">人工评语</div>
         <textarea class="hi-ta" placeholder="对本次 A/B 的主观评价，如：B 更亲和但偏啰嗦、成本涨得不值"></textarea>
