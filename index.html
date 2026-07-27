@@ -1,0 +1,565 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Harness Lab · 策略对比验证平台 · Demo</title>
+<style>
+  :root{
+    --bg:#f5f5f4; --surface:#ffffff; --surface-2:#fafaf9;
+    --text:#1c1917; --text-2:#57534e; --text-3:#a8a29e;
+    --accent:#2563eb; --accent-soft:#eff6ff; --accent-2:#1d4ed8;
+    --border:#e7e5e4; --border-2:#f0efee;
+    --good:#16a34a; --good-soft:#f0fdf4; --bad:#dc2626; --bad-soft:#fef2f2; --flat:#a8a29e;
+    --wx-bg:#ededed; --wx-green:#95ec69; --shadow:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.05);
+    --radius:12px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    background:var(--bg); color:var(--text); font-size:13px; line-height:1.55; -webkit-font-smoothing:antialiased;
+  }
+  button{font-family:inherit;cursor:pointer}
+  .app{display:flex;height:100vh;overflow:hidden}
+
+  /* ---------- sidebar ---------- */
+  .sidebar{width:196px;flex:0 0 196px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column}
+  .brand{display:flex;align-items:center;gap:9px;padding:16px 16px 14px}
+  .brand .logo{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,#2563eb,#7c3aed);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px}
+  .brand .name{font-weight:700;font-size:15px;letter-spacing:.2px}
+  .brand .tag{font-size:10px;color:#fff;background:#f59e0b;border-radius:5px;padding:1px 5px;margin-left:2px;font-weight:600}
+  .nav{padding:6px 8px;flex:1}
+  .nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;color:var(--text-2);font-weight:500;margin-bottom:2px;user-select:none}
+  .nav-item:hover{background:var(--surface-2)}
+  .nav-item.active{background:var(--accent-soft);color:var(--accent-2);font-weight:600}
+  .nav-item .ic{width:15px;text-align:center;opacity:.8}
+  .side-foot{padding:12px 14px;border-top:1px solid var(--border);font-size:11px;color:var(--text-3)}
+  .side-foot b{color:var(--text-2)}
+
+  /* ---------- main ---------- */
+  .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+  .demobar{background:#1c1917;color:#e7e5e4;font-size:11.5px;padding:5px 16px;display:flex;justify-content:space-between;align-items:center}
+  .demobar b{color:#fbbf24}
+  .screen{flex:1;overflow:auto;display:none}
+  .screen.active{display:flex;flex-direction:column}
+
+  /* ---------- workbench top ---------- */
+  .wb-top{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .field{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-2)}
+  .field label{color:var(--text-3)}
+  select,.pill{border:1px solid var(--border);background:var(--surface);border-radius:8px;padding:5px 9px;font-size:12px;color:var(--text);font-family:inherit}
+  .btn{border:1px solid var(--border);background:var(--surface);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--text);font-weight:500}
+  .btn:hover{background:var(--surface-2)}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn.primary:hover{background:var(--accent-2)}
+  .btn.ghost{border-color:transparent;color:var(--accent-2)}
+  .spacer{flex:1}
+  .running{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;color:var(--good);font-weight:600}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--good);box-shadow:0 0 0 0 rgba(22,163,74,.5);animation:pulse 1.6s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(22,163,74,.45)}70%{box-shadow:0 0 0 6px rgba(22,163,74,0)}100%{box-shadow:0 0 0 0 rgba(22,163,74,0)}}
+
+  .wb-tabs{background:var(--surface);border-bottom:1px solid var(--border);padding:0 18px;display:flex;align-items:center;gap:2px}
+  .tab{padding:10px 14px;font-size:13px;color:var(--text-2);font-weight:500;border-bottom:2px solid transparent;user-select:none}
+  .tab:hover{color:var(--text)}
+  .tab.active{color:var(--accent-2);border-bottom-color:var(--accent);font-weight:600}
+  .wb-tabs .spacer{flex:1}
+
+  /* ---------- workbench body ---------- */
+  .wb-body{flex:1;display:flex;gap:14px;padding:14px 18px;overflow:auto}
+  .col-config{flex:0 0 268px;width:268px}
+  .col-center{flex:1;min-width:520px}
+  .col-metrics{flex:0 0 226px;width:226px}
+  .panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+  .panel-h{padding:11px 14px;border-bottom:1px solid var(--border-2);font-weight:600;font-size:12.5px;display:flex;align-items:center;justify-content:space-between}
+  .panel-b{padding:12px 14px}
+  .muted{color:var(--text-3)}
+  .sub{font-size:11px;color:var(--text-3);margin:2px 0 8px}
+
+  /* segmented (端 switch) */
+  .seg{display:inline-flex;background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:2px}
+  .seg button{border:0;background:transparent;padding:5px 12px;border-radius:7px;font-size:12px;color:var(--text-2);font-weight:500}
+  .seg button.on{background:var(--surface);color:var(--accent-2);box-shadow:0 1px 2px rgba(0,0,0,.08);font-weight:600}
+
+  /* module list */
+  .mod{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border:1px solid var(--border-2);border-radius:9px;margin-bottom:7px;background:var(--surface-2)}
+  .mod .mn{font-weight:600;font-size:12.5px}
+  .mod .mt{font-size:10.5px;color:var(--text-3)}
+  .mod.changed{border-color:#bfdbfe;background:var(--accent-soft)}
+  .mod.changed .mn::after{content:"●";color:var(--accent);margin-left:6px;font-size:9px;vertical-align:middle}
+  .sw{width:34px;height:20px;border-radius:20px;background:#d6d3d1;position:relative;transition:.15s;border:0;flex:0 0 auto}
+  .sw::after{content:"";position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;top:2px;left:2px;transition:.15s;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+  .sw.on{background:var(--good)}
+  .sw.on::after{left:16px}
+  .addbtn{width:100%;border:1px dashed var(--border);background:transparent;border-radius:9px;padding:7px;color:var(--text-2);font-size:12px}
+  .addbtn:hover{border-color:var(--accent);color:var(--accent-2)}
+  .kv{display:flex;justify-content:space-between;padding:5px 0;font-size:12px;border-bottom:1px dashed var(--border-2)}
+  .kv:last-child{border-bottom:0}
+  .kv .k{color:var(--text-3)}
+  .chip{display:inline-block;background:var(--accent-soft);color:var(--accent-2);border-radius:6px;padding:1px 7px;font-size:10.5px;margin:0 4px 3px 0}
+  .core{border:1px solid var(--border);border-radius:10px;padding:11px;background:linear-gradient(180deg,#fafafa,#f5f5f4)}
+  .core .ct{font-size:11px;color:var(--text-3);margin-bottom:5px}
+  .core .cn{font-weight:700}
+  .lock{font-size:10px;color:var(--text-3);border:1px solid var(--border);border-radius:5px;padding:0 5px;margin-left:6px}
+
+  /* AB previews */
+  .ab{display:flex;gap:14px;height:100%}
+  .ab-col{flex:1;display:flex;flex-direction:column;min-width:0}
+  .ab-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+  .ab-title{font-weight:700;font-size:13px}
+  .ab-badge{font-size:10.5px;border-radius:5px;padding:1px 7px;font-weight:600}
+  .ab-badge.a{background:#f1f5f9;color:#475569}
+  .ab-badge.b{background:var(--accent-soft);color:var(--accent-2)}
+  .ab-strat{font-size:11px;color:var(--text-3);margin-bottom:8px}
+
+  /* phone */
+  .phone{background:var(--wx-bg);border:1px solid var(--border);border-radius:16px;overflow:hidden;flex:1;display:flex;flex-direction:column;min-height:380px}
+  .phone.app{background:#f2f4f7}
+  .ph-bar{background:#ededed;border-bottom:1px solid #dcdcdc;text-align:center;font-size:12.5px;font-weight:600;padding:8px;color:#333}
+  .phone.app .ph-bar{background:#fff;color:#111}
+  .ph-body{flex:1;overflow:auto;padding:12px 10px;display:flex;flex-direction:column;gap:10px}
+  .msg{display:flex;gap:7px;max-width:88%}
+  .msg.user{align-self:flex-end;flex-direction:row-reverse}
+  .avatar{width:26px;height:26px;border-radius:6px;flex:0 0 auto;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+  .msg.user .avatar{background:#64748b}
+  .bubble{padding:8px 10px;border-radius:9px;font-size:12.5px;line-height:1.5;background:#fff;box-shadow:0 1px 1px rgba(0,0,0,.05)}
+  .msg.user .bubble{background:var(--wx-green)}
+  .ph-input{border-top:1px solid #dcdcdc;background:#f7f7f7;padding:7px 9px;display:flex;gap:7px;align-items:center}
+  .ph-input .box{flex:1;background:#fff;border:1px solid #e2e2e2;border-radius:7px;padding:6px 8px;color:var(--text-3);font-size:12px}
+  .ph-input .snd{background:var(--wx-green);border:0;border-radius:7px;padding:6px 12px;font-size:12px;font-weight:600;color:#2b3a1f}
+  .phone.app .ph-input .snd{background:var(--accent);color:#fff}
+  /* app card bubble */
+  .appcard{background:#fff;border:1px solid #e5e7eb;border-radius:11px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.06);width:100%}
+  .appcard .ac-top{padding:9px 11px;border-bottom:1px solid #f1f1f1;font-weight:700;font-size:12.5px;display:flex;align-items:center;gap:6px}
+  .appcard .ac-top .ai{width:16px;height:16px;border-radius:4px;background:var(--accent-soft);color:var(--accent-2);display:flex;align-items:center;justify-content:center;font-size:10px}
+  .appcard ul{margin:8px 11px;padding-left:16px;font-size:12px;color:var(--text-2)}
+  .appcard ul li{margin:3px 0}
+  .appcard .ac-btn{margin:0 11px 11px;border:1px solid var(--accent);color:var(--accent-2);background:var(--accent-soft);border-radius:7px;padding:6px;text-align:center;font-size:12px;font-weight:600}
+
+  /* metrics rail */
+  .metric{padding:9px 0;border-bottom:1px dashed var(--border-2)}
+  .metric:last-child{border-bottom:0}
+  .metric .mname{font-size:11px;color:var(--text-3);margin-bottom:3px}
+  .metric .mrow{display:flex;align-items:baseline;justify-content:space-between}
+  .metric .mv{font-size:14px;font-weight:700}
+  .metric .mv .mb{color:var(--text-3);font-weight:600;font-size:12px;margin-left:5px}
+  .delta{font-size:11px;font-weight:700;border-radius:5px;padding:1px 6px}
+  .delta.good{background:var(--good-soft);color:var(--good)}
+  .delta.bad{background:var(--bad-soft);color:var(--bad)}
+  .delta.flat{background:#f5f5f4;color:var(--flat)}
+
+  /* metrics detail tab */
+  table{width:100%;border-collapse:collapse;font-size:12.5px}
+  th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--border-2)}
+  th{color:var(--text-3);font-weight:600;font-size:11.5px;background:var(--surface-2)}
+  td.num{text-align:right;font-variant-numeric:tabular-nums}
+  .bar{height:6px;border-radius:4px;background:#e7e5e4;position:relative;margin-top:4px;overflow:hidden}
+  .bar>span{position:absolute;left:0;top:0;bottom:0;border-radius:4px}
+  .worse-list{margin:0;padding:0;list-style:none}
+  .worse-list li{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px dashed var(--border-2);font-size:12.5px}
+  .worse-list li:last-child{border-bottom:0}
+
+  /* eval */
+  .eval-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .score-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px dashed var(--border-2)}
+  .stars{color:#f59e0b;letter-spacing:2px}
+  .stars .off{color:#e7e5e4}
+  .radio{display:inline-flex;gap:10px}
+  .radio span{font-size:12px}
+  .radio .on{color:var(--accent-2);font-weight:600}
+  .judge{background:var(--surface-2);border:1px solid var(--border-2);border-radius:9px;padding:10px;font-size:12px;color:var(--text-2);margin-top:8px}
+  .ok-badge{background:var(--good-soft);color:var(--good);border-radius:6px;padding:1px 7px;font-size:11px;font-weight:600}
+
+  /* generic screens */
+  .page{padding:20px 22px;max-width:960px}
+  .page h2{font-size:18px;margin:0 0 4px}
+  .page .lead{color:var(--text-2);margin:0 0 16px}
+  .card2{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin-bottom:14px}
+  .tree{list-style:none;margin:0;padding:0}
+  .tree li{padding:8px 0;border-bottom:1px dashed var(--border-2);display:flex;align-items:center;gap:10px;font-size:13px}
+  .tree li:last-child{border-bottom:0}
+  .tagx{font-size:10.5px;border-radius:5px;padding:1px 7px;font-weight:600}
+  .tagx.base{background:#f1f5f9;color:#475569}
+  .tagx.exp{background:var(--accent-soft);color:var(--accent-2)}
+  .tagx.cand{background:#fef3c7;color:#b45309}
+  .diffbox{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;background:#0f172a;color:#e2e8f0;border-radius:9px;padding:12px;line-height:1.7}
+  .diffbox .add{color:#86efac}
+  .diffbox .del{color:#fca5a5}
+  .diffbox .ctx{color:#94a3b8}
+
+  /* toast */
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:#1c1917;color:#fff;padding:10px 16px;border-radius:9px;font-size:12.5px;box-shadow:0 8px 24px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:.2s;z-index:50}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">HL</div>
+      <div><span class="name">Harness Lab</span></div>
+    </div>
+    <nav class="nav" id="nav">
+      <div class="nav-item active" data-screen="workbench"><span class="ic">▤</span>测试台</div>
+      <div class="nav-item" data-screen="strategy"><span class="ic">⑃</span>策略库</div>
+      <div class="nav-item" data-screen="cases"><span class="ic">▦</span>Case 库</div>
+      <div class="nav-item" data-screen="runs"><span class="ic">≣</span>运行记录</div>
+      <div class="nav-item" data-screen="settings"><span class="ic">⚙</span>设置</div>
+    </nav>
+    <div class="side-foot">环境：<b>测试 sandbox</b><br>Core：<b>opencc v1.2.3</b></div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="demobar"><span>Harness Lab · P0 演示原型</span><span><b>MOCK 数据</b> · 仅用于团队对齐讨论，非真实运行结果</span></div>
+
+    <!-- ============ WORKBENCH ============ -->
+    <section class="screen active" id="screen-workbench">
+      <div class="wb-top">
+        <div class="field"><label>Case</label>
+          <select><option>Case_20240520_001 · 客户咨询_产品介绍</option><option>Case_002 · 对外动作_订票确认</option><option>Case_003 · 记忆冲突_地址更新</option></select>
+        </div>
+        <div class="field"><label>用户身份</label>
+          <select><option>普通用户</option><option>老用户(有历史收藏)</option><option>新用户</option></select>
+        </div>
+        <button class="btn" onclick="toast('已切换 Case（demo）')">切换 Case</button>
+        <div class="spacer"></div>
+        <span class="running"><span class="dot"></span>对比跑 运行中</span>
+        <button class="btn" onclick="toast('对比跑已重新触发（demo）')">重跑</button>
+      </div>
+
+      <div class="wb-tabs" id="wbtabs">
+        <div class="tab active" data-tab="interact">交互对比</div>
+        <div class="tab" data-tab="metrics">指标对比</div>
+        <div class="tab" data-tab="eval">效果评估</div>
+        <div class="spacer"></div>
+        <button class="btn ghost" onclick="toast('带 run/trace id 跳转算法团队 trace 工具（demo）')">看轨迹 →</button>
+        <button class="btn primary" onclick="toast('已把实验版 v1.3.0 存入策略库（demo）')">存为新版本到策略库</button>
+      </div>
+
+      <div class="wb-body">
+        <!-- config -->
+        <div class="col-config">
+          <div class="panel">
+            <div class="panel-h">策略装配 <span class="muted" style="font-weight:500">实验版 B</span></div>
+            <div class="panel-b">
+              <div class="sub">产品交互端</div>
+              <div class="seg" id="clientseg" style="margin-bottom:12px">
+                <button class="on" data-client="wechat">微信</button>
+                <button data-client="app">App</button>
+              </div>
+
+              <div class="sub">Agent 策略模块</div>
+              <div id="modlist"></div>
+              <button class="addbtn" onclick="toast('新增模块：定类型标识 + 配置 schema + 内容（demo）')">+ 添加模块</button>
+
+              <div class="sub" style="margin-top:14px">参数配置</div>
+              <div class="kv"><span class="k">策略版本</span><span>v1.3.0 <span class="muted">(fork v1.2.3)</span></span></div>
+              <div class="kv"><span class="k">Prompt 模板</span><span>summary_v2.tpl</span></div>
+              <div class="kv"><span class="k">工具集</span><span style="text-align:right">
+                <span class="chip">知识库</span><span class="chip">联网搜索</span><span class="chip">计算器</span></span></div>
+
+              <div class="sub" style="margin-top:14px">Agent Core <span class="lock">只读 · 算法团队维护</span></div>
+              <div class="core">
+                <div class="ct">引擎 / 模型</div>
+                <div class="cn">opencc v1.2.3 · gpt-4.1</div>
+                <div style="margin-top:6px"><span class="running"><span class="dot"></span>运行中</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- center (swaps by tab) -->
+        <div class="col-center" id="centerpane"></div>
+
+        <!-- metrics rail -->
+        <div class="col-metrics">
+          <div class="panel">
+            <div class="panel-h">实时指标对比 <span class="muted" style="font-weight:500">A / B</span></div>
+            <div class="panel-b" id="metricrail"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ STRATEGY LIB ============ -->
+    <section class="screen" id="screen-strategy">
+      <div class="page">
+        <h2>策略库</h2>
+        <p class="lead">所有 Strategy Bundle 的版本树。支持 fork、diff、打标签、归档。（mock）</p>
+        <div class="card2">
+          <div style="font-weight:600;margin-bottom:8px">客户咨询策略 · 版本树</div>
+          <ul class="tree">
+            <li>v1.0.0 <span class="muted">初始</span></li>
+            <li>v1.2.0 <span class="muted">调 prompt 模板</span></li>
+            <li>v1.2.3 <span class="tagx base">基线</span> <span class="muted">当前线上</span></li>
+            <li style="padding-left:22px">└ v1.3.0 <span class="tagx exp">实验</span><span class="tagx cand">候选</span> <span class="muted">memory topK 3→5，关消息分组</span></li>
+          </ul>
+        </div>
+        <div class="card2">
+          <div style="font-weight:600;margin-bottom:10px">diff：v1.2.3 → v1.3.0</div>
+          <div class="diffbox">
+<span class="ctx">module: memory_context</span><br>
+<span class="del">- recall.topK: 3</span><br>
+<span class="add">+ recall.topK: 5</span><br>
+<span class="ctx">module: system_prompt</span><br>
+<span class="del">- template: summary_v1.tpl</span><br>
+<span class="add">+ template: summary_v2.tpl</span><br>
+<span class="ctx">module: 消息分组</span><br>
+<span class="del">- enabled: true</span><br>
+<span class="add">+ enabled: false</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CASES ============ -->
+    <section class="screen" id="screen-cases">
+      <div class="page">
+        <h2>Case 库</h2>
+        <p class="lead">单 case + case set 两级，带期望值标注。想守住的一组打标当"常跑集"。（mock）</p>
+        <div class="card2" style="padding:0;overflow:hidden">
+          <table>
+            <thead><tr><th>ID</th><th>标题</th><th>标签</th><th>期望行为</th><th>端</th></tr></thead>
+            <tbody>
+              <tr><td>#001</td><td>客户咨询_产品介绍</td><td><span class="chip">咨询</span></td><td>即时问答 · 引用知识库</td><td>微信 / App</td></tr>
+              <tr><td>#002</td><td>对外动作_订票确认</td><td><span class="chip">高风险</span></td><td>触发确认门 ✓</td><td>App</td></tr>
+              <tr><td>#003</td><td>记忆冲突_地址更新</td><td><span class="chip">记忆</span></td><td>以最新陈述为准</td><td>微信</td></tr>
+              <tr><td>#004</td><td>主动消息_频控</td><td><span class="chip">主动</span></td><td>低频 · 可忽略</td><td>App</td></tr>
+              <tr><td>#005</td><td>长内容_调研产出</td><td><span class="chip">产出</span></td><td>走产物页</td><td>App</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card2"><b>常跑集：客户咨询回归 (8)</b> — 对比时默认带上，暂不做门禁拦截。</div>
+      </div>
+    </section>
+
+    <!-- ============ RUNS ============ -->
+    <section class="screen" id="screen-runs">
+      <div class="page">
+        <h2>运行记录</h2>
+        <p class="lead">每次 Run 的流水，历史指标和复现入口。（mock）</p>
+        <div class="card2" style="padding:0;overflow:hidden">
+          <table>
+            <thead><tr><th>Run</th><th>Bundle</th><th>Case</th><th>端</th><th>状态</th><th class="num">延迟</th><th class="num">成本</th><th></th></tr></thead>
+            <tbody>
+              <tr><td>#2041</td><td>v1.3.0</td><td>#001</td><td>App</td><td><span class="ok-badge">成功</span></td><td class="num">2.18s</td><td class="num">$0.014</td><td><a href="#" onclick="toast('跳算法 trace 工具（demo）');return false" style="color:var(--accent-2)">看轨迹</a></td></tr>
+              <tr><td>#2040</td><td>v1.2.3</td><td>#001</td><td>App</td><td><span class="ok-badge">成功</span></td><td class="num">1.24s</td><td class="num">$0.009</td><td><a href="#" onclick="toast('跳算法 trace 工具（demo）');return false" style="color:var(--accent-2)">看轨迹</a></td></tr>
+              <tr><td>#2039</td><td>v1.3.0</td><td>#001</td><td>微信</td><td><span class="ok-badge">成功</span></td><td class="num">1.92s</td><td class="num">$0.012</td><td><a href="#" onclick="toast('跳算法 trace 工具（demo）');return false" style="color:var(--accent-2)">看轨迹</a></td></tr>
+              <tr><td>#2038</td><td>v1.2.3</td><td>#001</td><td>微信</td><td><span class="ok-badge">成功</span></td><td class="num">1.10s</td><td class="num">$0.008</td><td><a href="#" onclick="toast('跳算法 trace 工具（demo）');return false" style="color:var(--accent-2)">看轨迹</a></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SETTINGS ============ -->
+    <section class="screen" id="screen-settings">
+      <div class="page">
+        <h2>设置</h2>
+        <p class="lead">环境、模型、配额。（mock）</p>
+        <div class="card2"><div class="kv"><span class="k">运行环境</span><span>测试 sandbox（外部工具默认 mock/回放）</span></div>
+          <div class="kv"><span class="k">默认模型</span><span>gpt-4.1</span></div>
+          <div class="kv"><span class="k">评审模型 (LLM judge)</span><span>gpt-4.1-mini（独立于被测模型）</span></div>
+          <div class="kv"><span class="k">单日成本配额</span><span>$50 / 天</span></div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------------- mock data ---------------- */
+const modules = [
+  {id:'persona', name:'人设 (System prompt)', type:'system_prompt', on:true, changed:true},
+  {id:'summary', name:'summary (输出摘要)', type:'output', on:true, changed:false},
+  {id:'group',   name:'消息分组',            type:'hook',   on:false, changed:true},
+  {id:'mem',     name:'Memory / context',   type:'memory_context', on:true, changed:true},
+];
+
+const convA = [
+  {role:'user', text:'请介绍一下你们的智能客服产品'},
+  {role:'bot',  text:'我们的智能客服基于大模型，提供 7×24 小时在线服务，支持多轮对话、知识库问答，帮助企业提升客户服务效率和用户体验。',
+    card:{title:'智能客服产品', items:['7×24 小时在线','多轮对话理解','知识库问答','提升服务效率']}},
+  {role:'user', text:'支持哪些接入方式？'},
+  {role:'bot',  text:'支持 Web、App、微信公众号、小程序，提供 API 和 SDK，方便快速接入。',
+    card:{title:'接入方式', items:['Web / App','微信公众号 / 小程序','完整 API + SDK']}},
+];
+const convB = [
+  {role:'user', text:'请介绍一下你们的智能客服产品'},
+  {role:'bot',  text:'你好呀～很高兴为你介绍我们的智能客服产品 😊 它基于先进的大语言模型技术，致力于为企业提供智能化客服方案。7×24 小时不间断服务、多轮对话理解、精准知识库问答，全方位提升客户服务效率和满意度！',
+    card:{title:'智能客服产品 · 为你介绍', items:['7×24 小时不间断 😊','多轮对话，越聊越懂你','知识库精准问答','效率与满意度双提升']}},
+  {role:'user', text:'支持哪些接入方式？'},
+  {role:'bot',  text:'我们支持超多接入方式哦～包括 Web 网页、移动 App、微信公众号、小程序，同时提供完整的 API 文档和 SDK，支持快速接入和二次开发，满足不同企业的技术需求 💪',
+    card:{title:'接入方式 · 灵活多样', items:['Web 网页 / 移动 App','微信公众号 / 小程序','完整 API 文档 + SDK','支持二次开发 💪']}},
+];
+
+// 7 metrics; dir relative to B vs A (good/bad/flat)
+const metrics = [
+  {name:'回复质量',        a:'3.6', b:'3.9',   delta:'+8%',  dir:'good', pa:72, pb:78},
+  {name:'任务完成率',      a:'100%',b:'100%',  delta:'0',    dir:'flat', pa:100,pb:100},
+  {name:'成本 (Token)',    a:'856', b:'1,234', delta:'+44%', dir:'bad',  pa:69, pb:100},
+  {name:'延迟 P50',        a:'1.24s',b:'2.18s',delta:'+76%', dir:'bad',  pa:57, pb:100},
+  {name:'对话轮次',        a:'3',   b:'3',     delta:'0',    dir:'flat', pa:100,pb:100},
+  {name:'memory 命中率',   a:'0.62',b:'0.71',  delta:'+15%', dir:'good', pa:62, pb:71},
+  {name:'错误率',          a:'8%',  b:'3%',    delta:'-5pp', dir:'good', pa:100,pb:38},
+];
+
+/* ---------------- state ---------------- */
+let client = 'wechat';
+let tab = 'interact';
+
+/* ---------------- render ---------------- */
+function renderModules(){
+  const el = document.getElementById('modlist');
+  el.innerHTML = modules.map(m=>`
+    <div class="mod ${m.changed?'changed':''}">
+      <div><div class="mn">${m.name}</div><div class="mt">${m.type}</div></div>
+      <button class="sw ${m.on?'on':''}" data-mod="${m.id}" title="启用/停用"></button>
+    </div>`).join('');
+  el.querySelectorAll('.sw').forEach(b=>b.onclick=()=>{
+    const m = modules.find(x=>x.id===b.dataset.mod); m.on=!m.on; renderModules();
+    toast((m.on?'启用':'停用')+' 模块：'+m.name+'（模块开关变化也进 diff）');
+  });
+}
+
+function phone(conv, variant){
+  const head = client==='wechat' ? 'Handy · 微信' : 'Handy · App';
+  const body = conv.map(t=>{
+    if(t.role==='user'){
+      return `<div class="msg user"><div class="avatar">我</div><div class="bubble">${t.text}</div></div>`;
+    }
+    if(client==='app' && t.card){
+      const lis = t.card.items.map(i=>`<li>${i}</li>`).join('');
+      return `<div class="msg"><div class="avatar">H</div><div class="appcard">
+        <div class="ac-top"><span class="ai">▤</span>${t.card.title}</div>
+        <ul>${lis}</ul><div class="ac-btn">查看详情</div></div></div>`;
+    }
+    return `<div class="msg"><div class="avatar">H</div><div class="bubble">${t.text}</div></div>`;
+  }).join('');
+  return `<div class="phone ${client==='app'?'app':''}">
+    <div class="ph-bar">${head}</div>
+    <div class="ph-body">${body}</div>
+    <div class="ph-input"><div class="box">输入消息…</div><button class="snd">发送</button></div>
+  </div>`;
+}
+
+function renderCenter(){
+  const el = document.getElementById('centerpane');
+  if(tab==='interact'){
+    el.innerHTML = `<div class="ab">
+      <div class="ab-col">
+        <div class="ab-head"><span class="ab-title">策略配置 A</span><span class="ab-badge a">基线 v1.2.3</span></div>
+        <div class="ab-strat">人设 · 专业 / 简洁 / 200 字</div>
+        ${phone(convA,'a')}
+      </div>
+      <div class="ab-col">
+        <div class="ab-head"><span class="ab-title">策略配置 B</span><span class="ab-badge b">实验 v1.3.0</span></div>
+        <div class="ab-strat">人设 · 友好 / 详细 / 300 字</div>
+        ${phone(convB,'b')}
+      </div>
+    </div>`;
+  } else if(tab==='metrics'){
+    const rows = metrics.map(m=>`
+      <tr>
+        <td>${m.name}</td>
+        <td class="num">${m.a}</td>
+        <td class="num">${m.b}</td>
+        <td class="num"><span class="delta ${m.dir}">${arrow(m.dir)} ${m.delta}</span></td>
+      </tr>`).join('');
+    el.innerHTML = `
+      <div class="panel">
+        <div class="panel-h">指标对比 · A (基线 v1.2.3) vs B (实验 v1.3.0) <span class="muted" style="font-weight:500">case set 客户咨询回归 (8)</span></div>
+        <div class="panel-b" style="padding:0">
+          <table>
+            <thead><tr><th>指标</th><th class="num">A</th><th class="num">B</th><th class="num">净变化</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      </div>
+      <div class="panel" style="margin-top:14px">
+        <div class="panel-h">恶化排序 <span class="muted" style="font-weight:500">B 相对 A 变差的地方</span></div>
+        <div class="panel-b">
+          <ul class="worse-list">
+            <li><span>延迟 P50</span><span class="delta bad">▼ +0.94s</span></li>
+            <li><span>成本 (Token)</span><span class="delta bad">▼ +378</span></li>
+            <li><span>case #005 长内容产出 · 延迟</span><span><span class="delta bad">▼ +1.4s</span> <a href="#" onclick="toast('跳算法 trace 工具（demo）');return false" style="color:var(--accent-2);margin-left:8px">看轨迹→</a></span></li>
+            <li><span>case #002 订票确认 · 成本</span><span><span class="delta bad">▼ +$0.01</span> <a href="#" onclick="toast('跳算法 trace 工具（demo）');return false" style="color:var(--accent-2);margin-left:8px">看轨迹→</a></span></li>
+          </ul>
+          <div class="sub" style="margin-top:10px">结论：B 质量和命中率更好，但成本和延迟是代价——是否值得由团队定。</div>
+        </div>
+      </div>`;
+  } else {
+    el.innerHTML = `
+      <div class="eval-grid">
+        <div class="panel">
+          <div class="panel-h">人工评分 <span class="muted" style="font-weight:500">当前 case · B</span></div>
+          <div class="panel-b">
+            <div class="sub">盲评模式已开（隐藏是哪版）</div>
+            <div class="score-row"><span>回复质量</span><span class="stars">★★★★<span class="off">★</span></span></div>
+            <div class="score-row"><span>是否守分寸</span><span class="radio"><span class="on">● 是</span><span>○ 否</span></span></div>
+            <div class="score-row"><span>是否越红线</span><span class="radio"><span>○ 是</span><span class="on">● 否</span></span></div>
+            <div class="score-row"><span>行为符合期望</span><span class="radio"><span class="on">● 是</span><span>○ 否</span></span></div>
+            <div style="margin-top:12px"><button class="btn primary" onclick="toast('已提交评分，进入下一条（demo）')">提交并下一条</button></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-h">自动评测</div>
+          <div class="panel-b">
+            <div class="score-row"><span>LLM judge · 质量</span><span><b>A 3.6</b> → <b style="color:var(--good)">B 3.9</b></span></div>
+            <div class="score-row"><span>规则指标</span><span class="ok-badge">全通过</span></div>
+            <div class="score-row"><span>自动↔人工 一致性</span><span>0.78 <span class="ok-badge">达标</span></span></div>
+            <div class="judge"><b>judge 理由（B）：</b>回复更完整、语气亲和，覆盖了接入方式细节；扣分点是略偏长，信息密度低于 A。</div>
+          </div>
+        </div>
+      </div>`;
+  }
+}
+
+function renderRail(){
+  const el = document.getElementById('metricrail');
+  el.innerHTML = metrics.map(m=>`
+    <div class="metric">
+      <div class="mname">${m.name}</div>
+      <div class="mrow">
+        <div class="mv">${m.a}<span class="mb">→ ${m.b}</span></div>
+        <span class="delta ${m.dir}">${arrow(m.dir)} ${m.delta}</span>
+      </div>
+    </div>`).join('');
+}
+
+function arrow(dir){ return dir==='good'?'▲':dir==='bad'?'▼':'＝'; }
+
+/* ---------------- interactions ---------------- */
+document.getElementById('clientseg').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b)return;
+  client=b.dataset.client;
+  document.querySelectorAll('#clientseg button').forEach(x=>x.classList.toggle('on',x===b));
+  if(tab==='interact') renderCenter();
+});
+document.getElementById('wbtabs').addEventListener('click',e=>{
+  const t=e.target.closest('.tab'); if(!t)return;
+  tab=t.dataset.tab;
+  document.querySelectorAll('#wbtabs .tab').forEach(x=>x.classList.toggle('active',x===t));
+  renderCenter();
+});
+document.getElementById('nav').addEventListener('click',e=>{
+  const it=e.target.closest('.nav-item'); if(!it)return;
+  document.querySelectorAll('.nav-item').forEach(x=>x.classList.toggle('active',x===it));
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+it.dataset.screen).classList.add('active');
+});
+
+let toastTimer;
+function toast(msg){
+  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+/* init */
+renderModules(); renderCenter(); renderRail();
+</script>
+</body>
+</html>
