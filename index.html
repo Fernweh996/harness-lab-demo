@@ -346,9 +346,8 @@
           <div class="mtab active" data-mode="harness" onclick="setMode('harness')">Harness Eval</div>
           <div class="mtab" data-mode="model" onclick="setMode('model')">Model Eval</div>
         </div>
-        <span class="mode-hint" id="modeHint">改策略、A/B 对比（切策略重跑，不需评测集）</span>
+        <span class="mode-hint" id="modeHint">改策略、A/B 对比（自己输入对话，不用评测集）</span>
       </div>
-      <div id="mode-harness" class="mode-pane">
       <div class="wb-top">
         <div class="field"><label>Case</label>
           <select id="caseSel"><option>Case_20260724_001 · 客户咨询_产品介绍</option><option>Case_20260724_002 · 对外动作_订票确认</option><option>Case_20260724_003 · 记忆冲突_地址更新</option></select>
@@ -362,8 +361,8 @@
       </div>
 
       <div class="wb-main">
-        <!-- ===== 策略区（左） ===== -->
-        <aside class="strategy-region">
+        <!-- ===== 左侧：Harness=策略装配 / Model=模型切换 ===== -->
+        <aside class="strategy-region" id="panel-harness">
           <div class="panel">
             <div class="panel-h">策略区 · 装配 <span class="muted" style="font-weight:500">实验版 B</span></div>
             <div class="panel-b">
@@ -373,8 +372,25 @@
             </div>
           </div>
         </aside>
+        <aside class="strategy-region" id="panel-model" hidden>
+          <div class="panel">
+            <div class="panel-h">Model 切换 <span class="muted" style="font-weight:500">A 基线 · B 待验证</span></div>
+            <div class="panel-b">
+              <div class="sub">同一套 harness，只换被测 model 对比</div>
+              <div class="mod">
+                <div class="mn">对照组 A · 基线模型</div><div class="mt">baseline model</div>
+                <div class="mod-ab"><div class="mab"><span class="mab-l">A</span><select class="mod-ver"><option>hy3</option></select></div></div>
+              </div>
+              <div class="mod changed">
+                <div class="mn">实验组 B · 待验证模型</div><div class="mt">candidate model</div>
+                <div class="mod-ab"><div class="mab"><span class="mab-l">B</span><select class="mod-ver"><option>hy4</option><option>hy3.5</option><option>gpt-5.5</option></select></div></div>
+              </div>
+              <div class="sub" style="margin-top:12px">harness（策略）保持不变：opencc v1.2.3 · 当前策略版</div>
+            </div>
+          </div>
+        </aside>
 
-        <!-- ===== 评估区（右） ===== -->
+        <!-- ===== 评估区（右，两模式共用） ===== -->
         <section class="eval-region">
           <div class="wb-tabs" id="wbtabs">
             <div class="tab active" data-tab="interact">交互对比</div>
@@ -393,37 +409,6 @@
             </div>
           </div>
         </section>
-      </div>
-      </div><!-- /mode-harness -->
-
-      <div id="mode-model" class="mode-pane" hidden>
-        <div class="wb-top">
-          <div class="field"><label>评测集</label><select><option>客户咨询回归集 (8)</option><option>全量基准 (120)</option><option>对外动作确认门 (8)</option></select></div>
-          <div class="field"><label>模型 A · 基线</label><select><option>hy3</option></select></div>
-          <div class="field"><label>模型 B · 待验证</label><select><option>hy4</option><option>hy3.5</option><option>gpt-5.5</option></select></div>
-          <button class="btn primary" onclick="toast('已注入评测集，在整套 case 上跑模型 A/B')">注入评测集并运行</button>
-          <div class="spacer"></div>
-          <span class="muted" style="font-size:12px">换模型需在整套评测集上验证</span>
-        </div>
-        <div style="flex:1;overflow:auto;padding:20px 22px">
-          <div class="panel">
-            <div class="panel-h">模型对比结果 · 评测集 客户咨询回归集 (8) <span class="muted" style="font-weight:500">同一 harness，只换模型</span></div>
-            <div class="panel-b" style="padding:0">
-              <table>
-                <thead><tr><th style="width:34%">指标</th><th class="c">A · hy3</th><th class="c">B · hy4</th><th class="c">净变化</th></tr></thead>
-                <tbody>
-                  <tr><td>评测集通过率</td><td class="c">86%</td><td class="c">92%</td><td class="c"><span class="delta good">▲ +6pp</span></td></tr>
-                  <tr><td>首字延迟 TTFT</td><td class="c">0.6s</td><td class="c">0.5s</td><td class="c"><span class="delta good">▲ -17%</span></td></tr>
-                  <tr><td>任务完成耗时</td><td class="c">1.24s</td><td class="c">1.05s</td><td class="c"><span class="delta good">▲ -15%</span></td></tr>
-                  <tr><td>Token 消耗</td><td class="c">856</td><td class="c">910</td><td class="c"><span class="delta bad">▼ +6%</span></td></tr>
-                  <tr><td>工具调用数</td><td class="c">1.2</td><td class="c">1.1</td><td class="c"><span class="delta good">▲ -8%</span></td></tr>
-                  <tr><td>人评均分（抽样）</td><td class="c">3.8</td><td class="c">4.1</td><td class="c"><span class="delta good">▲ +8%</span></td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div class="card2" style="margin-top:14px"><b>为什么 Model Eval 要注入评测集</b>：换模型影响是全局的，不能只看一两条。要在整套评测集（回归集 / 基准）上跑，看整体通过率和指标分布，才敢判断"换这个模型值不值"。单条策略微调用 Harness Eval 更快。</div>
-        </div>
       </div>
     </section>
 
@@ -926,13 +911,13 @@ document.getElementById('nav').addEventListener('click',e=>{
 
 function setMode(m){
   document.querySelectorAll('.mtab').forEach(x=>x.classList.toggle('active',x.dataset.mode===m));
-  const h=document.getElementById('mode-harness'), mo=document.getElementById('mode-model');
-  if(h) h.hidden = (m!=='harness');
-  if(mo) mo.hidden = (m!=='model');
+  const ph=document.getElementById('panel-harness'), pm=document.getElementById('panel-model');
+  if(ph) ph.hidden = (m!=='harness');
+  if(pm) pm.hidden = (m!=='model');
   const hint=document.getElementById('modeHint');
   if(hint) hint.textContent = m==='harness'
-    ? '改策略、A/B 对比（切策略重跑，不需评测集）'
-    : '换模型、注入评测集，在整套评测集上验证效果';
+    ? '改策略、A/B 对比（自己输入对话，不用评测集）'
+    : '换模型 A/B 对比（同一套 harness，只换 model）';
 }
 
 function toggleSidebar(){
