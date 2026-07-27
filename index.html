@@ -125,17 +125,17 @@
   .chat-in{border-top:1px solid var(--border-2);padding:9px 12px;display:flex;gap:8px;align-items:center;color:var(--text-3);font-size:12px}
   .chat-in .chat-snd{margin-left:auto;background:var(--good);color:#fff;border:0;border-radius:8px;padding:5px 13px;font-size:12px;font-weight:600}
   /* 推理链路（横向） */
-  .chain-wrap{display:flex;flex-direction:column;gap:16px}
-  .chain-row{background:var(--surface);border:1px solid var(--border-2);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 16px}
-  .chain-head{font-weight:600;font-size:13px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
-  .chain{display:flex;align-items:stretch;overflow-x:auto;padding-bottom:4px}
-  .ch-node{flex:0 0 auto;min-width:104px;max-width:160px;border:1px solid var(--border);border-radius:12px;padding:9px 11px;background:var(--surface)}
+  .chain-cols{display:flex;gap:16px;align-items:flex-start}
+  .chain-col{flex:1;min-width:0;background:var(--surface);border:1px solid var(--border-2);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 16px}
+  .chain-head{font-weight:600;font-size:13px;margin-bottom:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .chain{display:flex;flex-direction:column}
+  .ch-node{border:1px solid var(--border);border-radius:12px;padding:9px 11px;background:var(--surface)}
   .ch-node.diff{border-color:var(--blue);background:var(--accent-soft)}
   .ch-l{font-weight:600;font-size:12px;color:var(--text)}
   .ch-node.diff .ch-l{color:var(--accent-2)}
   .ch-s{font-size:10.5px;color:var(--text-3);margin-top:3px;line-height:1.4}
   .ch-d{font-size:10px;color:var(--text-3);margin-top:5px;font-variant-numeric:tabular-nums}
-  .ch-arrow{flex:0 0 auto;align-self:center;color:var(--text-3);padding:0 8px;font-size:14px}
+  .ch-arrow{align-self:center;color:var(--text-3);padding:3px 0;font-size:13px}
   .panel{background:var(--surface);border:1px solid var(--border-2);border-radius:var(--radius);box-shadow:var(--shadow)}
   .panel-h{padding:14px 18px;border-bottom:1px solid var(--border-2);font-weight:600;font-size:13px;letter-spacing:-.01em;display:flex;align-items:center;justify-content:space-between}
   .panel-b{padding:16px 18px}
@@ -706,7 +706,7 @@ function phone(conv, variant){
 
 function renderChain(nodes){
   return nodes.map((n,i)=>`
-    ${i>0?'<span class="ch-arrow">→</span>':''}
+    ${i>0?'<span class="ch-arrow">↓</span>':''}
     <div class="ch-node${n.diff?' diff':''}">
       <div class="ch-l">${n.label}</div>
       <div class="ch-s">${n.sub||''}</div>
@@ -765,17 +765,17 @@ function renderCenter(){
       </div>`;
   } else if(tab==='trace'){
     el.innerHTML = `
-      <div class="chain-wrap">
-        <div class="chain-row">
-          <div class="chain-head">A <span class="ab-badge a">基线 v1.2.3</span> <span class="muted" style="font-weight:400">hy3 · 总耗时 1.24s</span></div>
+      <div class="chain-cols">
+        <div class="chain-col">
+          <div class="chain-head">A <span class="ab-badge a">基线 v1.2.3</span> <span class="muted" style="font-weight:400">hy3 · 1.24s</span></div>
           <div class="chain">${renderChain(chainA)}</div>
         </div>
-        <div class="chain-row">
-          <div class="chain-head">B <span class="ab-badge b">实验 v1.3.0</span> <span class="muted" style="font-weight:400">hy3 · 总耗时 2.18s</span></div>
+        <div class="chain-col">
+          <div class="chain-head">B <span class="ab-badge b">实验 v1.3.0</span> <span class="muted" style="font-weight:400">hy3 · 2.18s</span></div>
           <div class="chain">${renderChain(chainB)}</div>
         </div>
-        <div class="sub" style="margin-top:2px">推理链路：query → agent prompt → 分解 → tool（搜到什么 / 返回什么）→ summary → 给用户。蓝色 = B 相对 A 变化或新增（v2 决定先联网 → 多一步联网搜索、生成更长）。<a href="#" onclick="toast('跳算法团队 trace 工具看完整 span 明细');return false" style="color:var(--accent-2)">看完整 trace →</a></div>
-      </div>`;
+      </div>
+      <div class="sub" style="margin-top:10px">推理链路：query → agent prompt → 分解 → tool（搜到什么 / 返回什么）→ summary → 给用户。蓝色 = B 相对 A 变化或新增（v2 决定先联网 → 多一步联网搜索、生成更长）。</div>`;
   } else if(tab==='metrics'){
     const rows = metrics.map(m=>`
       <tr>
