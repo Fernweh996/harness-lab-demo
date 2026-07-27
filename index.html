@@ -233,6 +233,29 @@
   .diffbox .del{color:#ff8a80}
   .diffbox .ctx{color:#98989d}
 
+  /* 策略库：模块浏览 + 预览/编辑 */
+  .lib{display:flex;gap:16px;align-items:flex-start}
+  .lib-list{flex:0 0 212px;width:212px;background:var(--surface);border:1px solid var(--border-2);border-radius:var(--radius);box-shadow:var(--shadow);padding:8px}
+  .lib-item{padding:9px 11px;border-radius:10px;cursor:pointer;margin-bottom:2px}
+  .lib-item:hover{background:var(--surface-2)}
+  .lib-item.on{background:var(--accent-soft)}
+  .lib-item .li-n{font-weight:600;font-size:12.5px;color:var(--text)}
+  .lib-item .li-t{font-size:10.5px;color:var(--text-3);margin-top:1px}
+  .lib-item .li-chg{color:var(--blue);font-size:9.5px;font-weight:600;margin-left:5px}
+  .lib-detail{flex:1;min-width:0;background:var(--surface);border:1px solid var(--border-2);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+  .lib-dh{padding:14px 18px;border-bottom:1px solid var(--border-2);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .lib-dh .dh-name{font-weight:600;font-size:15px;letter-spacing:-.01em}
+  .lib-dh .dh-type{font-size:11px;color:var(--text-3);margin-top:2px}
+  .lib-body{padding:16px 20px}
+  .doc{font-size:13px;color:var(--text-2);line-height:1.7}
+  .doc .doc-h1{font-size:17px;color:var(--text);margin:0 0 12px;font-weight:600;letter-spacing:-.01em}
+  .doc h3{font-size:13.5px;color:var(--text);margin:16px 0 6px;font-weight:600}
+  .doc h4{font-size:12.5px;color:var(--text);margin:12px 0 4px;font-weight:600}
+  .doc ul{margin:4px 0 8px;padding-left:20px}
+  .doc li{margin:3px 0}
+  .doc p{margin:6px 0}
+  .editta{width:100%;box-sizing:border-box;min-height:360px;border:1px solid var(--border);border-radius:12px;padding:14px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;line-height:1.7;color:var(--text);resize:vertical}
+
   /* toast — 居中 HUD */
   .toast{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.94);background:rgba(30,30,32,.82);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);color:#fff;padding:16px 24px;border-radius:18px;font-size:13.5px;font-weight:500;box-shadow:0 20px 50px rgba(0,0,0,.3);opacity:0;pointer-events:none;transition:opacity .22s,transform .22s cubic-bezier(.34,1.56,.64,1);z-index:9999}
   .toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
@@ -310,31 +333,12 @@
 
     <!-- ============ STRATEGY LIB ============ -->
     <section class="screen" id="screen-strategy">
-      <div class="page">
+      <div class="page" style="max-width:1120px">
         <h2>策略库</h2>
-        <p class="lead">所有 Strategy Bundle 的版本树。支持 fork、diff、打标签、归档。（mock）</p>
-        <div class="card2">
-          <div style="font-weight:600;margin-bottom:8px">客户咨询策略 · 版本树</div>
-          <ul class="tree">
-            <li>v1.0.0 <span class="muted">初始</span></li>
-            <li>v1.2.0 <span class="muted">调 prompt 模板</span></li>
-            <li>v1.2.3 <span class="tagx base">基线</span> <span class="muted">当前线上</span></li>
-            <li style="padding-left:22px">└ v1.3.0 <span class="tagx exp">实验</span><span class="tagx cand">候选</span> <span class="muted">memory topK 3→5，关消息分组</span></li>
-          </ul>
-        </div>
-        <div class="card2">
-          <div style="font-weight:600;margin-bottom:10px">diff：v1.2.3 → v1.3.0</div>
-          <div class="diffbox">
-<span class="ctx">module: Prompt / 人设 (system_prompt)</span><br>
-<span class="del">- template: v1</span><br>
-<span class="add">+ template: v2</span><br>
-<span class="ctx">module: Memory / 记忆 (memory)</span><br>
-<span class="del">- recall.topK: 3</span><br>
-<span class="add">+ recall.topK: 5</span><br>
-<span class="ctx">module: Hooks / 扩展 (hooks · 消息分组)</span><br>
-<span class="del">- enabled: true</span><br>
-<span class="add">+ enabled: false</span>
-          </div>
+        <p class="lead">按策略模块浏览、预览、编辑；每个模块是一份可运行的策略文档。（mock）</p>
+        <div class="lib">
+          <aside class="lib-list" id="libList"></aside>
+          <section class="lib-detail" id="libDetail"></section>
         </div>
       </div>
     </section>
@@ -458,6 +462,154 @@ const traceB=[
   {label:'模型调用 · 生成回复 · 300字',dur:520,diff:true,io:{in:'检索+联网结果 + prompt（友好/300字）',act:'生成更详细回复',out:'300 字文本（含 emoji）'}},
   {label:'输出',dur:48,io:{in:'回复文本',act:'微信纯文本呈现',out:'已发送'}},
 ];
+
+// 策略库 mock：每个模块 = 一份可运行的策略文档
+const strategyModules = [
+  {id:'prompt', name:'Prompt / 人设', type:'system_prompt', version:'v1.3.0', tags:['实验'], changed:true, source:
+`# 人设 · System prompt
+
+## 固定底色
+- 真诚、有分寸、能接情绪、不装熟。
+- Handy 是同一个 Agent，不因微信或客户端改变人格。
+
+## 红线
+- 不伪造能力、不伪造成功。
+- 不暴露内部工具和路径。
+
+## 对外动作确认门
+- 发消息、订、付、提交、写入第三方，必须先确认。
+
+## 风格（v2）
+- 结论先行，短回复不堆结构。
+- 语气随关系画像调浓淡，不改任务优先级与风险判断。`},
+
+  {id:'memory', name:'Memory / 记忆', type:'memory', version:'v1.3.0', tags:['实验'], changed:true, source:
+`# 记忆 · Memory
+
+## 写入
+- 只记明确来源，不写主观推断画像。
+- 即时通道 + 反思通道两条链路。
+
+## 召回
+- 精确召回 + 背景召回。
+- topK = 5，相似度阈值 0.80。
+- 冲突以最新明确陈述为准。
+
+## 用户控制
+- 可查、可删、可改、可拒。
+- 过期事实先确认再用。`},
+
+  {id:'tools', name:'Tools / 工具', type:'toolset', version:'v1.2.3', tags:['基线'], changed:false, source:
+`# 工具 · ToolSet
+
+## 风险分级
+- 能力内低风险动作：直接做。
+- 能力内高风险动作：走确认门。
+- 能力外动作：如实说明，给降级方案。
+
+## 失败兜底
+- 工具失败不伪造成功。
+- 给用户可理解的替代路径。
+
+## 工具来源
+- Skill、MCP、bash/CLI 工具、CUA、知识库/联网搜索/计算器。`},
+
+  {id:'output', name:'Output / 输出呈现', type:'output', version:'v1.2.3', tags:['基线'], changed:false, source:
+`# 输出 · Output
+
+## 原则
+- 结论先行。
+- 短回复不堆结构。
+- 长内容走 H5 或产物页。
+
+## 端差异
+- 微信：纯文本要短、清楚、少刷屏。
+- App：卡片、任务面板、报告页、可编辑草稿。
+
+## 回执
+- 做事类输出要有回执，长任务要有过程反馈。`},
+
+  {id:'hooks', name:'Hooks / 主动消息', type:'hooks', version:'v1.3.0', tags:['实验'], changed:true, source:
+`# 主动消息 · Hooks
+
+## 只在四类价值成立时出现
+- 用户交代的事有新进展。
+- 提醒/跟踪/订阅对象有有效事件。
+- 用户显式上下文可转成低打扰建议。
+- 空入口需要一句轻承接。
+
+## 冷启优先级
+- P0 任务状态：最多露出 3 条。
+- P1 提醒或跟踪：只播有效变化。
+- P2 上下文洞察：基于显式行为的轻建议。
+- P3 空入口轻主动：轻问候，不强找话题。
+
+## 频控
+- 低频、可忽略、可降权。
+- 忽略 1 次进 7 天冷却；连续忽略 2 次仅在新证据时触发。`},
+
+  {id:'guardrails', name:'Guardrails / 护栏', type:'guardrails', version:'v1.2.3', tags:['基线'], changed:false, source:
+`# 护栏 · Guardrails
+
+## 红线
+- 不伪造能力、不伪造成功。
+- 不暴露内部工具与路径。
+- 不主动展示“我很了解你”。
+
+## 确认门
+- 对外动作（发消息 / 订 / 付 / 提交 / 写第三方）先草稿或摘要，确认后执行。
+
+## 降级
+- 能力外如实说明并给替代路径。`},
+];
+let libSel='prompt', libMode='preview';
+
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function mdToHtml(md){
+  const lines=md.split('\n'); let html='', inList=false;
+  const close=()=>{ if(inList){html+='</ul>';inList=false;} };
+  for(const raw of lines){
+    const l=raw.trim();
+    if(/^### /.test(l)){close();html+='<h4>'+esc(l.slice(4))+'</h4>';}
+    else if(/^## /.test(l)){close();html+='<h3>'+esc(l.slice(3))+'</h3>';}
+    else if(/^# /.test(l)){close();html+='<h2 class="doc-h1">'+esc(l.slice(2))+'</h2>';}
+    else if(/^- /.test(l)){ if(!inList){html+='<ul>';inList=true;} html+='<li>'+esc(l.slice(2))+'</li>';}
+    else if(l===''){close();}
+    else {close();html+='<p>'+esc(l)+'</p>';}
+  }
+  close(); return html;
+}
+function renderLib(){
+  const list=document.getElementById('libList'), det=document.getElementById('libDetail');
+  if(!list||!det) return;
+  list.innerHTML = strategyModules.map(m=>`
+    <div class="lib-item ${m.id===libSel?'on':''}" onclick="selectLib('${m.id}')">
+      <div class="li-n">${m.name}${m.changed?'<span class="li-chg">● 改</span>':''}</div>
+      <div class="li-t">${m.type} · ${m.version}</div>
+    </div>`).join('');
+  const m=strategyModules.find(x=>x.id===libSel)||strategyModules[0];
+  const tags=m.tags.map(t=>`<span class="tagx ${t==='基线'?'base':'exp'}">${t}</span>`).join(' ');
+  det.innerHTML = `
+    <div class="lib-dh">
+      <div><div class="dh-name">${m.name}</div><div class="dh-type">${m.type} · ${m.version} ${tags}</div></div>
+      <div class="spacer"></div>
+      <div class="seg">
+        <button class="${libMode==='preview'?'on':''}" onclick="setLibMode('preview')">预览</button>
+        <button class="${libMode==='edit'?'on':''}" onclick="setLibMode('edit')">编辑</button>
+      </div>
+      <button class="btn" onclick="toast('查看该模块与基线的 diff')">查看 diff</button>
+      <button class="btn" onclick="toast('已 fork 出实验分支')">fork</button>
+      <button class="btn primary" onclick="toast('已保存为新版本')">保存新版本</button>
+    </div>
+    <div class="lib-body">
+      ${libMode==='preview'
+        ? `<div class="doc">${mdToHtml(m.source)}</div>`
+        : `<textarea class="editta" oninput="updateLibSource(this.value)">${esc(m.source)}</textarea>`}
+    </div>`;
+}
+function selectLib(id){ libSel=id; renderLib(); }
+function setLibMode(mode){ libMode=mode; renderLib(); }
+function updateLibSource(v){ const m=strategyModules.find(x=>x.id===libSel); if(m) m.source=v; }
 
 /* ---------------- state ---------------- */
 let client = 'wechat';
@@ -696,7 +848,7 @@ caseSel.addEventListener('change',()=>{
 });
 
 /* init */
-renderModules(); renderCenter(); renderRail();
+renderModules(); renderCenter(); renderRail(); renderLib();
 </script>
 </body>
 </html>
