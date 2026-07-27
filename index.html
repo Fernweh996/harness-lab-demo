@@ -141,6 +141,7 @@
   .metric{padding:9px 0;border-bottom:1px dashed var(--border-2)}
   .metric:last-child{border-bottom:0}
   .metric .mname{font-size:11px;color:var(--text-3);margin-bottom:3px}
+  .mtag{display:inline-block;font-size:9px;font-weight:600;color:#b45309;background:#fef3c7;border-radius:5px;padding:0 5px;margin-left:5px;vertical-align:middle}
   .metric .mrow{display:flex;align-items:baseline;justify-content:space-between}
   .metric .mv{font-size:14px;font-weight:700}
   .metric .mv .mb{color:var(--text-3);font-weight:600;font-size:12px;margin-left:5px}
@@ -391,9 +392,9 @@ const convB = [
     card:{title:'接入方式 · 灵活多样', items:['Web 网页 / 移动 App','微信公众号 / 小程序','完整 API 文档 + SDK','支持二次开发 💪']}},
 ];
 
-// 7 metrics; dir relative to B vs A (good/bad/flat)
+// 7 metrics; dir relative to B vs A (good/bad/flat); src: '人评' 标记含人工评分
 const metrics = [
-  {name:'回复质量',        a:'3.6', b:'3.9',   delta:'+8%',  dir:'good', pa:72, pb:78},
+  {name:'回复质量',        a:'3.6', b:'3.9',   delta:'+8%',  dir:'good', pa:72, pb:78, src:'人评'},
   {name:'任务完成率',      a:'100%',b:'100%',  delta:'0',    dir:'flat', pa:100,pb:100},
   {name:'成本 (Token)',    a:'856', b:'1,234', delta:'+44%', dir:'bad',  pa:69, pb:100},
   {name:'延迟 P50',        a:'1.24s',b:'2.18s',delta:'+76%', dir:'bad',  pa:57, pb:100},
@@ -517,12 +518,12 @@ function renderRail(){
   const el = document.getElementById('metricrail');
   el.innerHTML = metrics.map(m=>`
     <div class="metric">
-      <div class="mname">${m.name}</div>
+      <div class="mname">${m.name}${m.src?'<span class="mtag">'+m.src+'</span>':''}</div>
       <div class="mrow">
         <div class="mv">${m.a}<span class="mb">→ ${m.b}</span></div>
         <span class="delta ${m.dir}">${arrow(m.dir)} ${m.delta}</span>
       </div>
-    </div>`).join('');
+    </div>`).join('') + '<div class="sub" style="margin:10px 0 0">人评=含人工评分，其余为自动评测</div>';
 }
 
 function arrow(dir){ return dir==='good'?'▲':dir==='bad'?'▼':'＝'; }
