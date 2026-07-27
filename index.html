@@ -118,11 +118,10 @@
   .seg button.on{background:var(--surface);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.12);font-weight:600}
 
   /* module list */
-  .mod{display:flex;align-items:center;justify-content:space-between;padding:11px 13px;border:1px solid var(--border-2);border-left:3px solid transparent;border-radius:12px;margin-bottom:8px;background:var(--surface);transition:.15s}
+  .mod{display:flex;align-items:center;justify-content:space-between;padding:11px 13px;border:1px solid var(--border-2);border-radius:12px;margin-bottom:8px;background:var(--surface);transition:.15s}
   .mod:hover{background:var(--surface-2)}
   .mod .mn{font-weight:600;font-size:13px;letter-spacing:-.01em}
   .mod .mt{font-size:10.5px;color:var(--text-3);margin-top:1px}
-  .mod.changed{border-left-color:var(--blue)}
   .mod.changed .mn::after{content:"● 改";color:var(--blue);margin-left:6px;font-size:9.5px;vertical-align:middle;font-weight:600}
   .sw{width:42px;height:25px;border-radius:25px;background:#e9e9ea;position:relative;transition:.2s cubic-bezier(.4,0,.2,1);border:0;flex:0 0 auto}
   .sw::after{content:"";position:absolute;width:21px;height:21px;border-radius:50%;background:#fff;top:2px;left:2px;transition:.2s cubic-bezier(.4,0,.2,1);box-shadow:0 1px 3px rgba(0,0,0,.2)}
