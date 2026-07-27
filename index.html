@@ -83,11 +83,14 @@
   .seg button.on{background:var(--surface);color:var(--accent-2);box-shadow:0 1px 2px rgba(0,0,0,.08);font-weight:600}
 
   /* module list */
-  .mod{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border:1px solid var(--border-2);border-radius:9px;margin-bottom:7px;background:var(--surface-2)}
+  .mod{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border:1px solid var(--border-2);border-left:3px solid var(--border);border-radius:9px;margin-bottom:7px;background:var(--surface);transition:.15s}
   .mod .mn{font-weight:600;font-size:12.5px}
   .mod .mt{font-size:10.5px;color:var(--text-3)}
-  .mod.changed{border-color:#bfdbfe;background:var(--accent-soft)}
-  .mod.changed .mn::after{content:"●";color:var(--accent);margin-left:6px;font-size:9px;vertical-align:middle}
+  .mod.changed{border-left-color:var(--accent)}
+  .mod.changed .mn::after{content:"● 改";color:var(--accent);margin-left:6px;font-size:9.5px;vertical-align:middle;font-weight:600}
+  .mod.off{opacity:.5}
+  .mod.off .mn{text-decoration:line-through;text-decoration-color:var(--text-3)}
+  .mod .mstate{font-size:9.5px;color:var(--text-3);border:1px solid var(--border);border-radius:5px;padding:0 5px;margin-left:6px;vertical-align:middle}
   .sw{width:34px;height:20px;border-radius:20px;background:#d6d3d1;position:relative;transition:.15s;border:0;flex:0 0 auto}
   .sw::after{content:"";position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;top:2px;left:2px;transition:.15s;box-shadow:0 1px 2px rgba(0,0,0,.2)}
   .sw.on{background:var(--good)}
@@ -189,7 +192,7 @@
   .diffbox .ctx{color:#94a3b8}
 
   /* toast */
-  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:#1c1917;color:#fff;padding:10px 16px;border-radius:9px;font-size:12.5px;box-shadow:0 8px 24px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:.2s;z-index:50}
+  .toast{position:fixed;left:50%;bottom:24px;top:auto;transform:translateX(-50%) translateY(16px);background:#1c1917;color:#fff;padding:10px 16px;border-radius:9px;font-size:12.5px;box-shadow:0 8px 24px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:.2s;z-index:9999}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
 </head>
@@ -251,7 +254,7 @@
                 <button data-client="app">App</button>
               </div>
 
-              <div class="sub">Agent 策略模块</div>
+              <div class="sub">Agent 策略模块 <span style="color:var(--text-3);font-weight:400">（左侧蓝条/● 改=相对基线改过；右侧开关=本版启用/停用，两者互不影响）</span></div>
               <div id="modlist"></div>
               <button class="addbtn" onclick="toast('新增模块：定类型标识 + 配置 schema + 内容（demo）')">+ 添加模块</button>
 
@@ -416,8 +419,8 @@ let tab = 'interact';
 function renderModules(){
   const el = document.getElementById('modlist');
   el.innerHTML = modules.map(m=>`
-    <div class="mod ${m.changed?'changed':''}">
-      <div><div class="mn">${m.name}</div><div class="mt">${m.type}</div></div>
+    <div class="mod ${m.changed?'changed':''} ${m.on?'':'off'}">
+      <div><div class="mn">${m.name}${m.on?'':'<span class="mstate">已停用</span>'}</div><div class="mt">${m.type}</div></div>
       <button class="sw ${m.on?'on':''}" data-mod="${m.id}" title="启用/停用"></button>
     </div>`).join('');
   el.querySelectorAll('.sw').forEach(b=>b.onclick=()=>{
@@ -555,7 +558,9 @@ document.getElementById('nav').addEventListener('click',e=>{
 
 let toastTimer;
 function toast(msg){
-  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+  const t=document.getElementById('toast');
+  if(t.parentElement!==document.body) document.body.appendChild(t); // 保证挂在 body 下，fixed 才相对视口（防止被包裹容器影响定位）
+  t.textContent=msg; t.classList.add('show');
   clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),2200);
 }
 
