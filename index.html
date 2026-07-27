@@ -419,7 +419,8 @@ let tab = 'interact';
 /* ---------------- render ---------------- */
 function renderModules(){
   const el = document.getElementById('modlist');
-  el.innerHTML = modules.map(m=>`
+  const ordered = [...modules].sort((a,b)=>(a.changed?0:1)-(b.changed?0:1)); // 改动的置顶，组内保持原序
+  el.innerHTML = ordered.map(m=>`
     <div class="mod ${m.changed?'changed':''}">
       <div><div class="mn">${m.name}</div><div class="mt">${m.type}</div></div>
       <button class="sw ${m.on?'on':''}" data-mod="${m.id}" title="启用/停用"></button>
