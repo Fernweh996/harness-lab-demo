@@ -159,12 +159,22 @@
   .cmsg.user{align-self:flex-end}
   .cb{background:var(--surface-2);border:1px solid var(--border-2);border-radius:12px;padding:9px 12px;font-size:12.5px;line-height:1.55;color:var(--text)}
   .cmsg.user .cb{background:var(--accent-soft);border-color:transparent}
-  .cb-act{margin-top:8px;display:flex;gap:6px}
+  .cb-act{margin-top:8px;display:flex;gap:6px;opacity:0;transition:.12s}
+  .ex-bubble:hover .cb-act{opacity:1}
   .cb-btn{border:1px solid var(--border);background:#fff;border-radius:7px;padding:2px 9px;font-size:11px;color:var(--text-2)}
   .cb-btn.good:hover{border-color:var(--good);color:var(--good)}
   .cb-btn.bad:hover{border-color:var(--bad);color:var(--bad)}
   .chat-in{border-top:1px solid var(--border-2);padding:9px 12px;display:flex;gap:8px;align-items:center;color:var(--text-3);font-size:12px}
   .chat-in .chat-snd{margin-left:auto;background:var(--good);color:#fff;border:0;border-radius:8px;padding:5px 13px;font-size:12px;font-weight:600}
+  /* 交互对比：按轮左右对齐 */
+  .xchat{height:100%;display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--border-2);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+  .ex-hd{display:flex;gap:14px;padding:12px 16px 8px;border-bottom:1px solid var(--border-2)}
+  .ex-hcol{flex:1;font-size:12px;font-weight:600;color:var(--text-2)}
+  .xbody{flex:1;overflow:auto;padding:14px 16px;display:flex;flex-direction:column;gap:14px}
+  .ex-q{align-self:flex-end;max-width:78%;background:var(--accent-soft);border-radius:12px;padding:8px 12px;font-size:12.5px;color:var(--text)}
+  .ex-ab{display:flex;gap:14px;align-items:flex-start}
+  .ex-cell{flex:1;min-width:0}
+  .ex-bubble{position:relative;background:var(--surface-2);border:1px solid var(--border-2);border-radius:12px;padding:9px 12px;font-size:12.5px;line-height:1.55;color:var(--text)}
   /* 推理链路（横向） */
   .chain-cols{display:flex;gap:16px;align-items:flex-start}
   .chain-col{flex:1;min-width:0;background:var(--surface);border:1px solid var(--border-2);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 16px}
@@ -791,23 +801,32 @@ function chatFlow(conv, tag){
     <div class="chat-in">输入消息…<button class="chat-snd">发送</button></div></div>`;
 }
 function saveCase(tag,kind){ toast('已存为 '+(kind==='good'?'good':'bad')+'case（query + '+tag+' 版输出）到 Case 库'); }
+function exBubble(text,tag){
+  return `<div class="ex-bubble">${text}
+    <div class="cb-act"><button class="cb-btn good" onclick="saveCase('${tag}','good')">👍 存 goodcase</button><button class="cb-btn bad" onclick="saveCase('${tag}','bad')">👎 存 badcase</button></div>
+  </div>`;
+}
+function alignedChat(){
+  let rows='';
+  for(let i=0;i<convA.length;i++){
+    if(convA[i].role==='user'){
+      rows+=`<div class="ex-q">${convA[i].text}</div>`;
+    }else{
+      rows+=`<div class="ex-ab"><div class="ex-cell">${exBubble(convA[i].text,'A')}</div><div class="ex-cell">${exBubble((convB[i]||{}).text||'','B')}</div></div>`;
+    }
+  }
+  return `<div class="xchat">
+    <div class="ex-hd"><div class="ex-hcol">A · 对照组</div><div class="ex-hcol">B · 实验组</div></div>
+    <div class="xbody">${rows}</div>
+    <div class="chat-in">输入消息…<button class="chat-snd">发送</button></div>
+  </div>`;
+}
 
 function renderCenter(){
   const el = document.getElementById('centerpane');
   const mc = document.getElementById('metricsCol'); if(mc) mc.style.display = (tab==='trace'||tab==='stratdiff'||tab==='casediff')?'none':'';
   if(tab==='interact'){
-    el.innerHTML = `<div class="preview-wrap">
-      <div class="ab">
-      <div class="ab-col">
-        <div class="ab-head"><span class="ab-title">A · 对照组</span></div>
-        ${chatFlow(convA,'A')}
-      </div>
-      <div class="ab-col">
-        <div class="ab-head"><span class="ab-title">B · 实验组</span></div>
-        ${chatFlow(convB,'B')}
-      </div>
-      </div>
-    </div>`;
+    el.innerHTML = alignedChat();
   } else if(tab==='stratdiff'){
     const changed = modules.filter(m=>m.verA!==m.verB);
     const body = !changed.length
