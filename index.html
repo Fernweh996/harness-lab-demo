@@ -424,7 +424,6 @@
                 <span class="only-chg" id="onlyChgBtn" onclick="toggleOnlyChanged()">只看改动</span>
               </div>
               <div id="modlist"></div>
-              <button class="btn" style="width:100%;margin-top:8px" onclick="resetB()">B 全部重置为基线（从 A fork）</button>
               <button class="btn primary" style="width:100%;margin-top:8px" onclick="toast('已把实验版 B 存入策略库')">存为新版本到策略库</button>
             </div>
           </div>
@@ -757,7 +756,6 @@ function renderLib(){
         <button class="${libMode==='edit'?'on':''}" onclick="setLibMode('edit')">编辑</button>
         <button class="${libMode==='diff'?'on':''}" onclick="setLibMode('diff')">改前后对比</button>
       </div>
-      <button class="btn" onclick="toast('已 fork 出实验分支')">fork</button>
       <button class="btn primary" onclick="toast('已保存为新版本')">保存新版本</button>
     </div>
     <div class="lib-body">
@@ -795,7 +793,6 @@ function renderModules(){
     </div>`;
   }).join('')) || '<div class="sub">当前无改动模块（A=B）。</div>';
 }
-function resetB(){ modules.forEach(m=>m.verB=m.verA); renderModules(); toast('已把 B 全部重置为基线（从 A fork），再逐个改 B'); }
 function toggleOnlyChanged(){ onlyChanged=!onlyChanged; const b=document.getElementById('onlyChgBtn'); if(b) b.classList.toggle('on',onlyChanged); renderModules(); }
 function setVer(id,side,v){
   const m=modules.find(x=>x.id===id); if(!m) return;
