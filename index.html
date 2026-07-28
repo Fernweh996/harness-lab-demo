@@ -349,6 +349,8 @@
   .lib-dh{padding:14px 18px;border-bottom:1px solid var(--border-2);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
   .lib-dh .dh-name{font-weight:600;font-size:15px;letter-spacing:-.01em}
   .lib-dh .dh-type{font-size:11px;color:var(--text-3);margin-top:2px}
+  .lib-versel{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--text-2)}
+  .lib-versel select{font-family:inherit;font-size:12px;color:var(--text);border:1px solid var(--border);border-radius:8px;padding:4px 8px;background:var(--surface)}
   .lib-body{padding:16px 20px}
   .doc{font-size:13px;color:var(--text-2);line-height:1.7}
   .doc .doc-h1{font-size:17px;color:var(--text);margin:0 0 12px;font-weight:600;letter-spacing:-.01em}
@@ -598,7 +600,8 @@ const chainRows=[
 
 // 策略库 mock：每个模块 = 一份可运行的策略文档
 const strategyModules = [
-  {id:'prompt', name:'Prompt / 人设', type:'system_prompt', version:'v1.3.0', tags:['实验'], changed:true, source:
+  {id:'prompt', name:'Prompt / 人设', type:'system_prompt', changed:true, versions:[
+    {v:'v1.3.0', tag:'实验', source:
 `# 人设 · System prompt
 
 ## 固定底色
@@ -615,8 +618,34 @@ const strategyModules = [
 ## 风格（v2）
 - 结论先行，短回复不堆结构。
 - 语气随关系画像调浓淡，不改任务优先级与风险判断。`},
+    {v:'v1.2.3', tag:'线上', source:
+`# 人设 · System prompt
 
-  {id:'memory', name:'Memory / 记忆', type:'memory', version:'v1.3.0', tags:['实验'], changed:true, source:
+## 固定底色
+- 真诚、有分寸、能接情绪、不装熟。
+- Handy 是同一个 Agent，不因微信或客户端改变人格。
+
+## 红线
+- 不伪造能力、不伪造成功。
+- 不暴露内部工具和路径。
+
+## 对外动作确认门
+- 发消息、订、付、提交、写入第三方，必须先确认。
+
+## 风格
+- 语气统一专业、简洁，200 字以内。`},
+    {v:'v1.2.0', tag:'历史', source:
+`# 人设 · System prompt
+
+## 固定底色
+- 专业、简洁、有礼。
+
+## 红线
+- 不伪造能力、不伪造成功。`},
+  ]},
+
+  {id:'memory', name:'Memory / 记忆', type:'memory', changed:true, versions:[
+    {v:'v1.3.0', tag:'实验', source:
 `# 记忆 · Memory
 
 ## 写入
@@ -631,8 +660,28 @@ const strategyModules = [
 ## 用户控制
 - 可查、可删、可改、可拒。
 - 过期事实先确认再用。`},
+    {v:'v1.2.3', tag:'线上', source:
+`# 记忆 · Memory
 
-  {id:'tools', name:'Tools / 工具', type:'toolset', version:'v1.2.3', tags:['基线'], changed:false, source:
+## 写入
+- 只记明确来源，不写主观推断画像。
+
+## 召回
+- 精确召回。
+- topK = 3，相似度阈值 0.82。
+- 冲突以最新明确陈述为准。
+
+## 用户控制
+- 可查、可删、可改、可拒。`},
+    {v:'v1.2.0', tag:'历史', source:
+`# 记忆 · Memory
+
+## 召回
+- topK = 3，相似度阈值 0.85。`},
+  ]},
+
+  {id:'tools', name:'Tools / 工具', type:'toolset', changed:false, versions:[
+    {v:'v1.2.3', tag:'线上', source:
 `# 工具 · ToolSet
 
 ## 风险分级
@@ -646,8 +695,18 @@ const strategyModules = [
 
 ## 工具来源
 - Skill、MCP、bash/CLI 工具、CUA、知识库/联网搜索/计算器。`},
+    {v:'v1.1.0', tag:'历史', source:
+`# 工具 · ToolSet
 
-  {id:'output', name:'Output / 输出呈现', type:'output', version:'v1.2.3', tags:['基线'], changed:false, source:
+## 风险分级
+- 高风险动作走确认门。
+
+## 工具来源
+- Skill、MCP、知识库/联网搜索。`},
+  ]},
+
+  {id:'output', name:'Output / 输出呈现', type:'output', changed:false, versions:[
+    {v:'v1.2.3', tag:'线上', source:
 `# 输出 · Output
 
 ## 原则
@@ -661,8 +720,18 @@ const strategyModules = [
 
 ## 回执
 - 做事类输出要有回执，长任务要有过程反馈。`},
+    {v:'v1.1.0', tag:'历史', source:
+`# 输出 · Output
 
-  {id:'hooks', name:'Hooks / 主动消息', type:'hooks', version:'v1.3.0', tags:['实验'], changed:true, source:
+## 原则
+- 结论先行，短回复。
+
+## 回执
+- 做事类输出要有回执。`},
+  ]},
+
+  {id:'hooks', name:'Hooks / 主动消息', type:'hooks', changed:true, versions:[
+    {v:'v1.3.0', tag:'实验', source:
 `# 主动消息 · Hooks
 
 ## 只在四类价值成立时出现
@@ -680,8 +749,27 @@ const strategyModules = [
 ## 频控
 - 低频、可忽略、可降权。
 - 忽略 1 次进 7 天冷却；连续忽略 2 次仅在新证据时触发。`},
+    {v:'v1.2.3', tag:'线上', source:
+`# 主动消息 · Hooks
 
-  {id:'guardrails', name:'Guardrails / 护栏', type:'guardrails', version:'v1.2.3', tags:['基线'], changed:false, source:
+## 只在四类价值成立时出现
+- 用户交代的事有新进展。
+- 提醒/跟踪/订阅对象有有效事件。
+
+## 消息分组
+- enabled: true（合并同类主动消息一起推送）。
+
+## 频控
+- 低频、可忽略、可降权。`},
+    {v:'v1.2.0', tag:'历史', source:
+`# 主动消息 · Hooks
+
+## 频控
+- 忽略 1 次进 7 天冷却。`},
+  ]},
+
+  {id:'guardrails', name:'Guardrails / 护栏', type:'guardrails', changed:false, versions:[
+    {v:'v1.2.3', tag:'线上', source:
 `# 护栏 · Guardrails
 
 ## 红线
@@ -694,6 +782,15 @@ const strategyModules = [
 
 ## 降级
 - 能力外如实说明并给替代路径。`},
+    {v:'v1.1.0', tag:'历史', source:
+`# 护栏 · Guardrails
+
+## 红线
+- 不伪造能力、不伪造成功。
+
+## 确认门
+- 对外动作先确认后执行。`},
+  ]},
 ];
 const moduleDiffs = {
   prompt:[{ctx:'## 风格'},{del:'- 语气统一专业、简洁，200 字以内'},{add:'+ 结论先行，短回复不堆结构'},{add:'+ 语气随关系画像调浓淡（v2）'}],
@@ -701,10 +798,14 @@ const moduleDiffs = {
   hooks:[{ctx:'## 消息分组'},{del:'- enabled: true'},{add:'+ enabled: false（本版关闭分组）'}],
 };
 let libSel='prompt', libMode='preview';
+const libVer={};
+function libOnline(m){ return m.versions.find(x=>x.tag==='线上') || m.versions[0]; }
+function libCurrent(m){ return m.versions.find(x=>x.v===libVer[m.id]) || libOnline(m); }
+function verTagClass(t){ return t==='实验'?'exp':'base'; }
 function renderDiff(m){
   const d=moduleDiffs[m.id];
-  if(!d) return `<div class="sub">与基线一致，本模块无改动。</div>`;
-  return `<div class="sub" style="margin-bottom:8px">${m.name}：当前版本 ${m.version} vs 基线</div><div class="diffbox">`
+  if(!d) return `<div class="sub">该模块线上与历史版本一致，无字段级改动。</div>`;
+  return `<div class="sub" style="margin-bottom:8px">${m.name}：实验版 vs 线上版</div><div class="diffbox">`
     + d.map(x=>x.ctx?`<span class="ctx">${esc(x.ctx)}</span>`:x.del?`<span class="del">${esc(x.del)}</span>`:`<span class="add">${esc(x.add)}</span>`).join('<br>')
     + `</div>`;
 }
@@ -727,17 +828,21 @@ function mdToHtml(md){
 function renderLib(){
   const list=document.getElementById('libList'), det=document.getElementById('libDetail');
   if(!list||!det) return;
-  list.innerHTML = strategyModules.map(m=>`
-    <div class="lib-item ${m.id===libSel?'on':''}" onclick="selectLib('${m.id}')">
+  list.innerHTML = strategyModules.map(m=>{
+    const on=libOnline(m);
+    return `<div class="lib-item ${m.id===libSel?'on':''}" onclick="selectLib('${m.id}')">
       <div class="li-n">${m.name}${m.changed?'<span class="li-chg">● 改</span>':''}</div>
-      <div class="li-t">${m.type} · ${m.version}</div>
-    </div>`).join('');
+      <div class="li-t">${m.type} · 线上 ${on.v}</div>
+    </div>`;
+  }).join('');
   const m=strategyModules.find(x=>x.id===libSel)||strategyModules[0];
-  const tags=m.tags.map(t=>`<span class="tagx ${t==='基线'?'base':'exp'}">${t}</span>`).join(' ');
+  const cur=libCurrent(m);
+  const verOpts=m.versions.map(v=>`<option value="${v.v}" ${v.v===cur.v?'selected':''}>${v.v} · ${v.tag}</option>`).join('');
   det.innerHTML = `
     <div class="lib-dh">
-      <div><div class="dh-name">${m.name}</div><div class="dh-type">${m.type} · ${m.version} ${tags}</div></div>
+      <div><div class="dh-name">${m.name}</div><div class="dh-type">${m.type} <span class="tagx ${verTagClass(cur.tag)}">${cur.tag}</span></div></div>
       <div class="spacer"></div>
+      <label class="lib-versel">版本 <select onchange="selectLibVer(this.value)">${verOpts}</select></label>
       <div class="seg">
         <button class="${libMode==='preview'?'on':''}" onclick="setLibMode('preview')">预览</button>
         <button class="${libMode==='edit'?'on':''}" onclick="setLibMode('edit')">编辑</button>
@@ -747,15 +852,16 @@ function renderLib(){
     </div>
     <div class="lib-body">
       ${libMode==='preview'
-        ? `<div class="doc">${mdToHtml(m.source)}</div>`
+        ? `<div class="doc">${mdToHtml(cur.source)}</div>`
         : libMode==='edit'
-        ? `<textarea class="editta" oninput="updateLibSource(this.value)">${esc(m.source)}</textarea>`
+        ? `<textarea class="editta" oninput="updateLibSource(this.value)">${esc(cur.source)}</textarea>`
         : renderDiff(m)}
     </div>`;
 }
 function selectLib(id){ libSel=id; renderLib(); }
+function selectLibVer(v){ libVer[libSel]=v; renderLib(); }
 function setLibMode(mode){ libMode=mode; renderLib(); }
-function updateLibSource(v){ const m=strategyModules.find(x=>x.id===libSel); if(m) m.source=v; }
+function updateLibSource(v){ const m=strategyModules.find(x=>x.id===libSel); if(m){ libCurrent(m).source=v; } }
 
 /* ---------------- state ---------------- */
 let client = 'wechat';
