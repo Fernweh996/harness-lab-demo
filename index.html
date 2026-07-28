@@ -114,6 +114,7 @@
   .v-act .btn{padding:5px 12px;font-size:12px}
   @keyframes vflash{0%{background:var(--accent-soft)}100%{background:rgba(255,255,255,.7)}}
   .verdict.flash{animation:vflash .9s ease}
+  .v-blind{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--text-2);flex:0 0 auto;margin-left:auto}
   .wb-main{flex:1;display:flex;overflow:hidden;min-height:0}
   .strategy-region{flex:0 0 300px;width:300px;overflow:auto;padding:16px 16px;border-right:1px solid var(--border);background:var(--surface)}
   .strategy-region .panel{border:0;box-shadow:none;background:transparent;border-radius:0}
@@ -747,6 +748,8 @@ function updateLibSource(v){ const m=strategyModules.find(x=>x.id===libSel); if(
 let client = 'wechat';
 let tab = 'interact';
 let onlyChanged = false;
+let blind = false;
+function toggleBlind(){ blind=!blind; renderCenter(); renderVerdict(); }
 
 /* ---------------- render ---------------- */
 function renderModules(){
@@ -835,8 +838,9 @@ function alignedChat(){
       rows+=`<div class="ex-ab"><div class="ex-cell">${exBubble(convA[i].text,'A')}</div><div class="ex-cell">${exBubble((convB[i]||{}).text||'','B')}</div></div>`;
     }
   }
+  const la = blind?'版本 甲':'A · 对照组', lb = blind?'版本 乙':'B · 实验组';
   return `<div class="xchat">
-    <div class="ex-hd"><div class="ex-hcol">A · 对照组</div><div class="ex-hcol">B · 实验组</div></div>
+    <div class="ex-hd"><div class="ex-hcol">${la}</div><div class="ex-hcol">${lb}</div></div>
     <div class="xbody">${rows}</div>
     <div class="chat-in">输入消息…<button class="chat-snd">发送</button></div>
   </div>`;
@@ -925,7 +929,8 @@ function renderCenter(){
         <div class="panel">
           <div class="panel-h">人工评价 <span class="muted" style="font-weight:500">当前 case</span></div>
           <div class="panel-b">
-            <div class="score-row"><span>整体倾向</span><span class="radio"><span>○ A 更好</span><span class="on">● B 更好</span><span>○ 相当</span></span></div>
+            <div class="score-row"><span>整体倾向</span><span class="radio">${blind?'<span>○ 甲更好</span><span class="on">● 乙更好</span><span>○ 相当</span>':'<span>○ A 更好</span><span class="on">● B 更好</span><span>○ 相当</span>'}</span></div>
+            ${blind?'<div class="sub" style="margin:2px 0 8px">盲评中：已隐藏哪版是实验版。</div>':''}
             <div class="score-row"><span>是否守分寸</span><span class="radio"><span class="on">● 是</span><span>○ 否</span></span></div>
             <div class="score-row"><span>是否越红线</span><span class="radio"><span>○ 是</span><span class="on">● 否</span></span></div>
             <div class="hi-label" style="margin-top:12px">评语</div>
@@ -990,14 +995,19 @@ document.getElementById('nav').addEventListener('click',e=>{
 
 function renderVerdict(){
   const el=document.getElementById('verdict'); if(!el) return;
+  const blindCtl = `<span class="v-blind">盲评 <button class="sw ${blind?'on':''}" onclick="toggleBlind()" title="隐藏哪版是实验版，避免打分偏见"></button></span>`;
+  if(blind){
+    el.innerHTML = `<span class="v-tag warn">盲评中</span><span class="v-reason">已隐藏哪版是实验版——先在效果评估里给「甲 / 乙」打分，评完关闭盲评再看结论。</span>${blindCtl}`;
+    return;
+  }
   const model = document.querySelector('.nav-sub.active') && document.querySelector('.nav-sub.active').dataset.mode==='model';
-  el.innerHTML = model
+  el.innerHTML = (model
     ? `<span class="v-tag good">B 略优</span><span class="v-main">模型 B · hy4</span>
        <span class="v-reason">逐 case 略优（订票确认门、记忆冲突处理更好），首字/耗时更快；Token 略高，兜底一条 A 更稳。</span>
        <div class="v-act"><button class="btn primary" onclick="decide('采用 hy4')">采用 B</button><button class="btn" onclick="decide('保持 hy3')">保持 A</button><button class="btn" onclick="decide('再评')">再评</button></div>`
     : `<span class="v-tag warn">需权衡</span><span class="v-main">B 实验版 v1.3.0</span>
        <span class="v-reason">质量倾向 B（更完整、亲和），但代价：延迟 +76% · Token +44% · 多调 1 次工具。</span>
-       <div class="v-act"><button class="btn primary" onclick="decide('采用 B')">采用 B</button><button class="btn" onclick="decide('保持 A')">保持 A</button><button class="btn" onclick="decide('再评')">再评</button></div>`;
+       <div class="v-act"><button class="btn primary" onclick="decide('采用 B')">采用 B</button><button class="btn" onclick="decide('保持 A')">保持 A</button><button class="btn" onclick="decide('再评')">再评</button></div>`) + blindCtl;
 }
 function decide(d){
   const tb=document.getElementById('verlog');
