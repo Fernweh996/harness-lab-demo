@@ -1054,7 +1054,21 @@ function toast(msg){
 const caseSel=document.getElementById('caseSel');
 const runBtn=document.getElementById('runBtn');
 const runIndicator=document.getElementById('runIndicator');
-let running=false, runTimer=null, runProg=null;
+let running=false, runTimer=null, runProg=null, expNo=41;
+function archiveExperiment(){
+  const tb=document.getElementById('verlog'); if(!tb) return;
+  expNo++;
+  const model = document.querySelector('.nav-sub.active') && document.querySelector('.nav-sub.active').dataset.mode==='model';
+  const cv=document.getElementById('caseSel'); const caseName=cv?((cv.value.split(' · ')[1])||cv.value):'';
+  const changed = modules.filter(m=>m.verA!==m.verB).map(m=>m.name.split(' / ')[0]).join('、')||'—';
+  const now=new Date().toLocaleString('zh-CN',{hour12:false});
+  const summary = model
+    ? '模型 A(hy3) vs B(hy4) on '+caseName+'：B 略优，结论待定'
+    : 'A vs B on '+caseName+'：延迟 +76% · Token +44% · 多调 1 次工具（需权衡）';
+  const tr=document.createElement('tr');
+  tr.innerHTML='<td>实验 #'+expNo+'</td><td>'+(model?'（换模型）':changed)+'</td><td>'+summary+'</td><td>'+(model?'算法':'产品')+'</td><td>'+now+'</td>';
+  tb.prepend(tr);
+}
 function resetIndicator(){ if(runIndicator){ clearInterval(runProg); runProg=null; runIndicator.style.display='none'; runIndicator.innerHTML='<span class="dot"></span>对比跑 运行中'; } }
 
 function startRun(){
@@ -1085,7 +1099,8 @@ function finishRun(){
   resetIndicator();
   renderCenter(); renderRail(); renderVerdict();
   const v=document.getElementById('verdict'); if(v){ v.classList.remove('flash'); void v.offsetWidth; v.classList.add('flash'); }
-  toast('运行完成 · 结论见顶部');
+  archiveExperiment();
+  toast('运行完成 · 已存档到版本记录 · 结论见顶部');
 }
 runBtn.addEventListener('click',()=>{
   if(running){ stopRun(); return; }
