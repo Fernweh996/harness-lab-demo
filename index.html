@@ -1137,7 +1137,7 @@ document.getElementById('nav').addEventListener('click',e=>{
     return;
   }
   const it=e.target.closest('.nav-item'); if(!it)return;
-  if(it.classList.contains('disabled')){ toast(it.dataset.screen==='evalsets'?'评测集库 暂未开放':'暂未开放'); return; }
+  if(it.classList.contains('disabled')){ toast('暂未开放'); return; }
   document.querySelectorAll('.nav-item').forEach(x=>x.classList.toggle('active',x===it));
   document.querySelectorAll('.nav-sub').forEach(x=>x.classList.remove('active'));
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
