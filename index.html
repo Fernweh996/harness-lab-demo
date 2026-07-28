@@ -919,26 +919,27 @@ function renderCenter(){
     el.innerHTML = `
       <div class="eval-grid">
         <div class="panel">
-          <div class="panel-h">人工评价 <span class="muted" style="font-weight:500">当前 case</span></div>
-          <div class="panel-b">
-            <div class="score-row"><span>整体倾向</span><span class="radio"><span>○ A 更好</span><span class="on">● B 更好</span><span>○ 相当</span></span></div>
-            <div class="score-row"><span>是否守分寸</span><span class="radio"><span class="on">● 是</span><span>○ 否</span></span></div>
-            <div class="score-row"><span>是否越红线</span><span class="radio"><span>○ 是</span><span class="on">● 否</span></span></div>
-            <div class="hi-label" style="margin-top:12px">评语</div>
-            <textarea class="hi-ta" placeholder="主观评价，如：B 更亲和、信息更全，但偏啰嗦、成本涨得多"></textarea>
-            <button class="btn primary hi-full" onclick="toast('已提交人工评价')">提交评价</button>
-          </div>
-        </div>
-        <div class="panel">
           <div class="panel-h">机评 <span class="muted" style="font-weight:500">后期接入</span></div>
           <div class="panel-b">
             <div class="sub">LLM-as-judge 自动质量评分将在二期接入。</div>
             <div class="judge">第一期只做客观指标（TTFT / 任务完成耗时 / Token / 工具调用数）+ 人工评价；机评（评审模型 gpt-5.5）二期再上，用于扩大评测规模、和人评做一致性校准。</div>
           </div>
         </div>
+        <div class="panel">
+          <div class="panel-h">人评 <span class="muted" style="font-weight:500">当前 case</span></div>
+          <div class="panel-b">
+            <div class="hi-label">人工评语</div>
+            <textarea class="hi-ta" oninput="syncComment(this.value)" placeholder="对本次 A/B 的主观评价，如：B 更亲和但偏啰嗦、成本涨得不值">${esc(hiComment)}</textarea>
+            <button class="btn primary hi-full" onclick="toast('已记录评语')">记录评语</button>
+          </div>
+        </div>
       </div>`;
   }
 }
+
+// 人工评语：效果评估页的人评 与 实时指标对比 rail 共用同一份内容，实时同步
+let hiComment='';
+function syncComment(v){ hiComment=v; document.querySelectorAll('.hi-ta').forEach(t=>{ if(t.value!==v) t.value=v; }); }
 
 function renderRail(){
   const el = document.getElementById('metricrail');
@@ -953,7 +954,7 @@ function renderRail(){
     + `<div class="sub" style="margin:10px 0 0">第一期客观指标；机评（LLM 打分）后期接入</div>`
     + `<div class="hi-note">
         <div class="hi-label">人工评语</div>
-        <textarea class="hi-ta" placeholder="对本次 A/B 的主观评价，如：B 更亲和但偏啰嗦、成本涨得不值"></textarea>
+        <textarea class="hi-ta" oninput="syncComment(this.value)" placeholder="对本次 A/B 的主观评价，如：B 更亲和但偏啰嗦、成本涨得不值">${esc(hiComment)}</textarea>
         <button class="hi-btn hi-full" onclick="toast('已记录评语')">记录评语</button>
       </div>`;
 }
