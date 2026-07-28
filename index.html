@@ -339,6 +339,13 @@
   .diffbox .add{color:#63e6a0}
   .diffbox .del{color:#ff8a80}
   .diffbox .ctx{color:#98989d}
+  .diffbox .hl{display:block;border-radius:5px;padding:1px 6px;margin:1px -6px}
+  .diffbox .del.hl{background:rgba(255,138,128,.16)}
+  .diffbox .add.hl{background:rgba(99,230,160,.14)}
+  .sdiff{display:flex;gap:14px;align-items:stretch}
+  .sdiff-col{flex:1;min-width:0;display:flex;flex-direction:column}
+  .sdiff-hd{font-size:11.5px;font-weight:600;color:var(--text-2);margin-bottom:6px}
+  .sdiff .diffbox{flex:1;margin:0}
 
   /* 策略库：模块浏览 + 预览/编辑 */
   .lib{display:flex;gap:16px;align-items:flex-start}
@@ -861,15 +868,19 @@ function renderCenter(){
       ? `<div class="sub">A / B 各模块版本一致，无策略差异。</div>`
       : changed.map(m=>{
           const d=moduleDiffs[m.id]||[];
-          const diff = d.map(x=>x.ctx?`<span class="ctx">${esc(x.ctx)}</span>`:x.del?`<span class="del">${esc(x.del)}</span>`:`<span class="add">${esc(x.add)}</span>`).join('<br>');
-          return `<div style="margin-bottom:16px">
-            <div style="font-weight:600;font-size:13px;margin-bottom:6px">${m.name} <span class="muted" style="font-weight:400">${m.type} · A ${m.verA} → B ${m.verB}</span></div>
-            <div class="diffbox">${diff||'（无字段级 diff）'}</div>
+          const aLines = d.filter(x=>!x.add).map(x=>x.ctx?`<span class="ctx">${esc(x.ctx)}</span>`:`<span class="del hl">${esc(x.del)}</span>`).join('<br>');
+          const bLines = d.filter(x=>!x.del).map(x=>x.ctx?`<span class="ctx">${esc(x.ctx)}</span>`:`<span class="add hl">${esc(x.add)}</span>`).join('<br>');
+          return `<div style="margin-bottom:18px">
+            <div style="font-weight:600;font-size:13px;margin-bottom:8px">${m.name} <span class="muted" style="font-weight:400">${m.type} · A ${m.verA} → B ${m.verB}</span></div>
+            <div class="sdiff">
+              <div class="sdiff-col"><div class="sdiff-hd">A · ${m.verA} · 基线</div><div class="diffbox">${aLines||'（无内容）'}</div></div>
+              <div class="sdiff-col"><div class="sdiff-hd">B · ${m.verB} · 实验</div><div class="diffbox">${bLines||'（无内容）'}</div></div>
+            </div>
           </div>`;
         }).join('');
     el.innerHTML = `
       <div class="panel">
-        <div class="panel-h">策略改前后对比 · A（基线 v1.2.3）vs B（实验 v1.3.0） <span class="muted" style="font-weight:500">${changed.length} 个模块改动 · 红=删 绿=增</span></div>
+        <div class="panel-h">策略改前后对比 · A（基线）vs B（实验）左右分栏 <span class="muted" style="font-weight:500">${changed.length} 个模块改动 · 左红=删 右绿=增，高亮为差异行</span></div>
         <div class="panel-b">${body}</div>
       </div>`;
   } else if(tab==='casediff'){
@@ -991,10 +1002,10 @@ function renderVerdict(){
   el.innerHTML = model
     ? `<span class="v-tag good">B 略优</span><span class="v-main">模型 B · hy4</span>
        <span class="v-reason">逐 case 略优（订票确认门、记忆冲突处理更好），首字/耗时更快；Token 略高，兜底一条 A 更稳。</span>
-       <div class="v-act"><button class="btn primary" onclick="decide('采用 hy4')">采用 B</button><button class="btn" onclick="decide('保持 hy3')">保持 A</button><button class="btn" onclick="decide('再评')">再评</button></div>`
+       <div class="v-act"><button class="btn" onclick="decide('保持 hy3')">保持 A</button><button class="btn primary" onclick="decide('采用 hy4')">采用 B</button></div>`
     : `<span class="v-tag warn">需权衡</span><span class="v-main">B 实验版 v1.3.0</span>
        <span class="v-reason">质量倾向 B（更完整、亲和），但代价：延迟 +76% · Token +44% · 多调 1 次工具。</span>
-       <div class="v-act"><button class="btn primary" onclick="decide('采用 B')">采用 B</button><button class="btn" onclick="decide('保持 A')">保持 A</button><button class="btn" onclick="decide('再评')">再评</button></div>`;
+       <div class="v-act"><button class="btn" onclick="decide('保持 A')">保持 A</button><button class="btn primary" onclick="decide('采用 B')">采用 B</button></div>`;
 }
 function decide(d){
   const tb=document.getElementById('verlog');
