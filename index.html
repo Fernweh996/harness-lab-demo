@@ -112,6 +112,8 @@
   .v-reason{font-size:12px;color:var(--text-2);flex:1;min-width:200px}
   .v-act{display:flex;gap:8px;flex:0 0 auto}
   .v-act .btn{padding:5px 12px;font-size:12px}
+  @keyframes vflash{0%{background:var(--accent-soft)}100%{background:rgba(255,255,255,.7)}}
+  .verdict.flash{animation:vflash .9s ease}
   .wb-main{flex:1;display:flex;overflow:hidden;min-height:0}
   .strategy-region{flex:0 0 300px;width:300px;overflow:auto;padding:16px 16px;border-right:1px solid var(--border);background:var(--surface)}
   .strategy-region .panel{border:0;box-shadow:none;background:transparent;border-radius:0}
@@ -1021,14 +1023,19 @@ function toast(msg){
 const caseSel=document.getElementById('caseSel');
 const runBtn=document.getElementById('runBtn');
 const runIndicator=document.getElementById('runIndicator');
-let running=false, runTimer=null;
+let running=false, runTimer=null, runProg=null;
+function resetIndicator(){ if(runIndicator){ clearInterval(runProg); runProg=null; runIndicator.style.display='none'; runIndicator.innerHTML='<span class="dot"></span>对比跑 运行中'; } }
 
 function startRun(){
   if(running) return;
   running=true;
   runBtn.disabled=false; runBtn.textContent='停止运行';
   runBtn.classList.remove('primary'); runBtn.classList.add('stop');
-  if(runIndicator) runIndicator.style.display='';
+  if(runIndicator){ runIndicator.style.display=''; }
+  let p=0;
+  const upd=()=>{ if(runIndicator) runIndicator.innerHTML='<span class="dot"></span>运行中… '+p+'%'; };
+  upd();
+  runProg=setInterval(()=>{ p=Math.min(96,p+8); upd(); },170);
   toast('对比跑运行中…');
   runTimer=setTimeout(finishRun,2200);
 }
@@ -1037,16 +1044,17 @@ function stopRun(){
   clearTimeout(runTimer); running=false;
   runBtn.classList.remove('stop'); runBtn.classList.add('primary');
   runBtn.textContent='开始运行'; runBtn.disabled=false;   // 中断后可重跑
-  if(runIndicator) runIndicator.style.display='none';
+  resetIndicator();
   toast('已停止运行');
 }
 function finishRun(){
   running=false;
   runBtn.classList.remove('stop'); runBtn.classList.add('primary');
   runBtn.textContent='开始运行'; runBtn.disabled=true;    // 结果已出 → 置灰，直到再换 case
-  if(runIndicator) runIndicator.style.display='none';
-  renderCenter(); renderRail();
-  toast('运行完成，结果已更新');
+  resetIndicator();
+  renderCenter(); renderRail(); renderVerdict();
+  const v=document.getElementById('verdict'); if(v){ v.classList.remove('flash'); void v.offsetWidth; v.classList.add('flash'); }
+  toast('运行完成 · 结论见顶部');
 }
 runBtn.addEventListener('click',()=>{
   if(running){ stopRun(); return; }
