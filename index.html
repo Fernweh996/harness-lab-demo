@@ -162,7 +162,7 @@
   .cmsg.user{align-self:flex-end}
   .cb{background:var(--surface-2);border:1px solid var(--border-2);border-radius:12px;padding:9px 12px;font-size:12.5px;line-height:1.55;color:var(--text)}
   .cmsg.user .cb{background:var(--accent-soft);border-color:transparent}
-  .cb-act{margin-top:8px;display:flex;gap:6px;opacity:0;transition:.12s}
+  .cb-act{display:none;gap:6px;margin-top:6px}
   .cb-btn{border:1px solid var(--border);background:#fff;border-radius:7px;padding:2px 9px;font-size:11px;color:var(--text-2)}
   .cb-btn.good:hover{border-color:var(--good);color:var(--good)}
   .cb-btn.bad:hover{border-color:var(--bad);color:var(--bad)}
@@ -176,11 +176,11 @@
   .pc-body{flex:1;overflow:auto;padding:16px 14px;display:flex;flex-direction:column;gap:12px;background:var(--bg)}
   .pm{display:flex;max-width:88%}
   .pm.user{align-self:flex-end}
-  .pm.bot{align-self:flex-start}
+  .pm.bot{align-self:flex-start;flex-direction:column;align-items:flex-start}
   .pb{position:relative;padding:10px 13px;border-radius:16px;font-size:12.5px;line-height:1.6}
   .pm.bot .pb{background:var(--surface);border:1px solid var(--border-2);border-bottom-left-radius:5px;color:var(--text);box-shadow:var(--shadow)}
   .pm.user .pb{background:var(--accent);color:#fff;border-bottom-right-radius:5px}
-  .pb:hover .cb-act{opacity:1}
+  .pm.bot:hover .cb-act,.cmsg:hover .cb-act{display:flex}
   .pc-input{flex:0 0 auto;margin:10px 12px 12px;padding:7px 7px 7px 12px;display:flex;gap:8px;align-items:center;color:var(--text-3);font-size:12px;background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,.07)}
   .pc-input .ci-plus{flex:0 0 auto;width:22px;height:22px;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:15px;line-height:1;color:var(--text-3)}
   .pc-input .ci-ph{flex:1;min-width:0}
@@ -844,9 +844,9 @@ function phoneCol(conv, tag, label){
     if(t.role==='user'){
       body+=`<div class="pm user"><div class="pb">${t.text}</div></div>`;
     }else{
-      body+=`<div class="pm bot"><div class="pb">${t.text}
+      body+=`<div class="pm bot"><div class="pb">${t.text}</div>
         <div class="cb-act"><button class="cb-btn good" onclick="saveCase('${tag}','good')">👍 存 goodcase</button><button class="cb-btn bad" onclick="saveCase('${tag}','bad')">👎 存 badcase</button></div>
-      </div></div>`;
+      </div>`;
     }
   }
   return `<div class="pchat">
