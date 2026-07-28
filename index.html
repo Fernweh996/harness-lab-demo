@@ -189,6 +189,15 @@
   .ch-s{font-size:10.5px;color:var(--text-3);margin-top:3px;line-height:1.4}
   .ch-d{font-size:10px;color:var(--text-3);margin-top:5px;font-variant-numeric:tabular-nums}
   .ch-arrow{align-self:center;color:var(--text-3);padding:3px 0;font-size:13px}
+  /* 轨迹对比：A/B 逐步对齐 diff */
+  .chain-diff{background:var(--surface);border:1px solid var(--border-2);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px}
+  .ch-hd{display:flex;gap:14px;margin-bottom:12px}
+  .ch-hc{flex:1;font-weight:600;font-size:12.5px}
+  .ch-row{display:flex;gap:14px}
+  .ch-c{flex:1;min-width:0}
+  .ch-arrow2{display:flex;gap:14px}
+  .ch-arrow2>span{flex:1;text-align:center;color:var(--text-3);font-size:13px;padding:3px 0}
+  .ch-empty{border-style:dashed !important;color:var(--text-3);text-align:center;background:transparent !important}
   .panel{background:var(--surface);border:1px solid var(--border-2);border-radius:var(--radius);box-shadow:var(--shadow)}
   .panel-h{padding:14px 18px;border-bottom:1px solid var(--border-2);font-weight:600;font-size:13px;letter-spacing:-.01em;display:flex;align-items:center;justify-content:space-between}
   .panel-b{padding:16px 18px}
@@ -561,23 +570,15 @@ const metrics = [
   {name:'工具调用数',    a:'1',     b:'2',     delta:'+1',   dir:'bad', rail:true},
 ];
 
-// 轨迹 = 推理链路（横向）：query → agent prompt → 分解 → tool → summary → 给用户；diff=B 相对 A 变化/新增
-const chainA=[
-  {label:'query', sub:'用户输入'},
-  {label:'agent prompt', sub:'system v1', dur:'0.6s'},
-  {label:'分解', sub:'规划：检索后作答'},
-  {label:'tool · 知识库', sub:'搜到 3 段 / 返回命中', dur:'0.26s'},
-  {label:'summary', sub:'汇总检索结果', dur:'0.14s'},
-  {label:'给用户', sub:'200 字回复', dur:'0.1s'},
-];
-const chainB=[
-  {label:'query', sub:'用户输入'},
-  {label:'agent prompt', sub:'system v2', dur:'0.9s', diff:true},
-  {label:'分解', sub:'规划：先联网再检索', diff:true},
-  {label:'tool · 知识库', sub:'搜到 3 段 / 返回命中', dur:'0.30s'},
-  {label:'tool · 联网', sub:'搜到 2 条 / 新增一步', dur:'0.25s', diff:true},
-  {label:'summary', sub:'汇总 检索+联网', dur:'0.20s', diff:true},
-  {label:'给用户', sub:'300 字回复', dur:'0.52s', diff:true},
+// 轨迹 = 推理链路，A/B 逐步对齐做 diff；diff=有差异，add=B 新增(A 无此步)
+const chainRows=[
+  {a:{l:'query',s:'用户输入'}, b:{l:'query',s:'用户输入'}},
+  {a:{l:'agent prompt',s:'system v1',d:'0.6s'}, b:{l:'agent prompt',s:'system v2',d:'0.9s'}, diff:true},
+  {a:{l:'分解',s:'规划：检索后作答'}, b:{l:'分解',s:'规划：先联网再检索'}, diff:true},
+  {a:{l:'tool · 知识库',s:'搜到 3 段',d:'0.26s'}, b:{l:'tool · 知识库',s:'搜到 3 段',d:'0.30s'}},
+  {a:null, b:{l:'tool · 联网',s:'搜到 2 条（新增）',d:'0.25s'}, add:true},
+  {a:{l:'summary',s:'汇总检索',d:'0.14s'}, b:{l:'summary',s:'汇总 检索+联网',d:'0.20s'}, diff:true},
+  {a:{l:'给用户',s:'200 字回复',d:'0.1s'}, b:{l:'给用户',s:'300 字回复',d:'0.52s'}, diff:true},
 ];
 
 // 策略库 mock：每个模块 = 一份可运行的策略文档
@@ -793,14 +794,17 @@ function phone(conv, variant){
   </div>`;
 }
 
-function renderChain(nodes){
-  return nodes.map((n,i)=>`
-    ${i>0?'<span class="ch-arrow">↓</span>':''}
-    <div class="ch-node${n.diff?' diff':''}">
-      <div class="ch-l">${n.label}</div>
-      <div class="ch-s">${n.sub||''}</div>
-      ${n.dur?`<div class="ch-d">${n.dur}</div>`:''}
-    </div>`).join('');
+function renderChainDiff(){
+  let html='';
+  chainRows.forEach((r,i)=>{
+    if(i>0) html+=`<div class="ch-arrow2"><span>↓</span><span>↓</span></div>`;
+    const cls = (r.diff||r.add)?'diff':'';
+    const cell=(n)=> n
+      ? `<div class="ch-node ${cls}"><div class="ch-l">${n.l}</div><div class="ch-s">${n.s||''}</div>${n.d?`<div class="ch-d">${n.d}</div>`:''}</div>`
+      : `<div class="ch-node ch-empty">（无此步）</div>`;
+    html+=`<div class="ch-row"><div class="ch-c">${cell(r.a)}</div><div class="ch-c">${cell(r.b)}</div></div>`;
+  });
+  return html;
 }
 function chatFlow(conv, tag){
   let body='';
@@ -857,7 +861,7 @@ function renderCenter(){
         }).join('');
     el.innerHTML = `
       <div class="panel">
-        <div class="panel-h">策略改前后对比 · A（基线 v1.2.3）vs B（实验 v1.3.0） <span class="muted" style="font-weight:500">${changed.length} 个模块改动</span></div>
+        <div class="panel-h">策略改前后对比 · A（基线 v1.2.3）vs B（实验 v1.3.0） <span class="muted" style="font-weight:500">${changed.length} 个模块改动 · 红=删 绿=增</span></div>
         <div class="panel-b">${body}</div>
       </div>`;
   } else if(tab==='casediff'){
@@ -880,17 +884,11 @@ function renderCenter(){
       <div class="sub" style="margin-top:10px">换模型是全局影响：逐 case 看 A/B 表现，避免只看一条就下结论。</div>`;
   } else if(tab==='trace'){
     el.innerHTML = `
-      <div class="chain-cols">
-        <div class="chain-col">
-          <div class="chain-head">A <span class="ab-badge a">基线 v1.2.3</span> <span class="muted" style="font-weight:400">hy3 · 1.24s</span></div>
-          <div class="chain">${renderChain(chainA)}</div>
-        </div>
-        <div class="chain-col">
-          <div class="chain-head">B <span class="ab-badge b">实验 v1.3.0</span> <span class="muted" style="font-weight:400">hy3 · 2.18s</span></div>
-          <div class="chain">${renderChain(chainB)}</div>
-        </div>
-      </div>
-      <div class="sub" style="margin-top:10px">推理链路：query → agent prompt → 分解 → tool（搜到什么 / 返回什么）→ summary → 给用户。蓝色 = B 相对 A 变化或新增（v2 决定先联网 → 多一步联网搜索、生成更长）。</div>`;
+      <div class="chain-diff">
+        <div class="ch-hd"><div class="ch-hc">A · 基线 v1.2.3 · hy3 · 1.24s</div><div class="ch-hc">B · 实验 v1.3.0 · hy3 · 2.18s</div></div>
+        ${renderChainDiff()}
+        <div class="sub" style="margin-top:12px">推理链路逐步对齐 diff：蓝色 = A/B 有差异或 B 新增的步骤（v2 决定先联网 → 多一步联网搜索、生成更长）。</div>
+      </div>`;
   } else if(tab==='metrics'){
     const rows = metrics.map(m=>`
       <tr>
