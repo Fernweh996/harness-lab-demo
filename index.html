@@ -103,6 +103,15 @@
   .mode-hint{font-size:11.5px;color:var(--text-3)}
   .mode-pane{flex:1;display:flex;flex-direction:column;min-height:0}
   .mode-pane[hidden]{display:none}
+  /* 结论卡 */
+  .verdict{display:flex;align-items:center;gap:14px;padding:11px 20px;border-bottom:1px solid var(--border-2);background:rgba(255,255,255,.7);backdrop-filter:blur(12px);flex-wrap:wrap}
+  .v-tag{font-size:11px;font-weight:700;border-radius:7px;padding:2px 9px;flex:0 0 auto}
+  .v-tag.warn{background:rgba(255,159,10,.16);color:#c2740a}
+  .v-tag.good{background:var(--good-soft);color:var(--good)}
+  .v-main{font-weight:600;font-size:13px;flex:0 0 auto}
+  .v-reason{font-size:12px;color:var(--text-2);flex:1;min-width:200px}
+  .v-act{display:flex;gap:8px;flex:0 0 auto}
+  .v-act .btn{padding:5px 12px;font-size:12px}
   .wb-main{flex:1;display:flex;overflow:hidden;min-height:0}
   .strategy-region{flex:0 0 300px;width:300px;overflow:auto;padding:16px 16px;border-right:1px solid var(--border);background:var(--surface)}
   .strategy-region .panel{border:0;box-shadow:none;background:transparent;border-radius:0}
@@ -397,6 +406,7 @@
 
         <!-- ===== 评估区（右，两模式共用） ===== -->
         <section class="eval-region">
+          <div class="verdict" id="verdict"></div>
           <div class="wb-tabs" id="wbtabs">
             <div class="tab active" data-tab="interact">交互对比</div>
             <div class="tab" data-tab="stratdiff" data-mode-only="harness">策略对比</div>
@@ -942,10 +952,24 @@ document.getElementById('nav').addEventListener('click',e=>{
   document.getElementById('screen-'+it.dataset.screen).classList.add('active');
 });
 
+function renderVerdict(){
+  const el=document.getElementById('verdict'); if(!el) return;
+  const model = document.querySelector('.nav-sub.active') && document.querySelector('.nav-sub.active').dataset.mode==='model';
+  el.innerHTML = model
+    ? `<span class="v-tag good">B 略优</span><span class="v-main">模型 B · hy4</span>
+       <span class="v-reason">逐 case 略优（订票确认门、记忆冲突处理更好），首字/耗时更快；Token 略高，兜底一条 A 更稳。</span>
+       <div class="v-act"><button class="btn primary" onclick="decide('采用 hy4')">采用 B</button><button class="btn" onclick="decide('保持 hy3')">保持 A</button><button class="btn" onclick="decide('再评')">再评</button></div>`
+    : `<span class="v-tag warn">需权衡</span><span class="v-main">B 实验版 v1.3.0</span>
+       <span class="v-reason">质量倾向 B（更完整、亲和），但代价：延迟 +76% · Token +44% · 多调 1 次工具。</span>
+       <div class="v-act"><button class="btn primary" onclick="decide('采用 B')">采用 B</button><button class="btn" onclick="decide('保持 A')">保持 A</button><button class="btn" onclick="decide('再评')">再评</button></div>`;
+}
+function decide(d){ toast('已记录决策：'+d+'（含人评）到版本记录'); }
+
 function setMode(m){
   const ph=document.getElementById('panel-harness'), pm=document.getElementById('panel-model');
   if(ph) ph.hidden = (m!=='harness');
   if(pm) pm.hidden = (m!=='model');
+  renderVerdict();
   const tc=document.getElementById('topCaseField'); if(tc) tc.style.display = (m==='model')?'none':'';
   document.querySelectorAll('#wbtabs .tab[data-mode-only]').forEach(t=>{ t.hidden = (t.dataset.modeOnly!==m); });
   const active=document.querySelector('#wbtabs .tab.active');
@@ -1015,7 +1039,7 @@ caseSel.addEventListener('change',()=>{
 });
 
 /* init */
-renderModules(); renderCenter(); renderRail(); renderLib();
+renderModules(); renderCenter(); renderRail(); renderLib(); renderVerdict();
 </script>
 </body>
 </html>
