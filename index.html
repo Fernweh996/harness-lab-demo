@@ -104,10 +104,9 @@
   .mode-pane{flex:1;display:flex;flex-direction:column;min-height:0}
   .mode-pane[hidden]{display:none}
   /* 结论卡 */
-  .tabs-blind{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--text-2);flex:0 0 auto}
-  .dec-row{display:flex;align-items:center;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border-2)}
-  .dec-row .dec-l{font-size:12px;color:var(--text-3);flex:1}
-  .dec-row .btn{padding:5px 12px;font-size:12px}
+  .tabs-blind{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--text-2);flex:0 0 auto;margin-left:10px}
+  .tabs-dec{padding:5px 12px;font-size:12px;flex:0 0 auto}
+  .tabs-dec:disabled{opacity:.4;cursor:not-allowed}
   .wb-main{flex:1;display:flex;overflow:hidden;min-height:0}
   .strategy-region{flex:0 0 300px;width:300px;overflow:auto;padding:16px 16px;border-right:1px solid var(--border);background:var(--surface)}
   .strategy-region .panel{border:0;box-shadow:none;background:transparent;border-radius:0}
@@ -307,12 +306,6 @@
   .bar>span{position:absolute;left:0;top:0;bottom:0;border-radius:4px}
   /* eval */
   .eval-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-  .score-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border-2)}
-  .stars{color:#ff9f0a;letter-spacing:2px}
-  .stars .off{color:rgba(0,0,0,.12)}
-  .radio{display:inline-flex;gap:12px}
-  .radio span{font-size:12px}
-  .radio .on{color:var(--accent-2);font-weight:600}
   .judge{background:var(--surface-2);border:1px solid var(--border-2);border-radius:12px;padding:12px;font-size:12px;color:var(--text-2);margin-top:10px}
   .ok-badge{background:var(--good-soft);color:var(--good);border-radius:7px;padding:2px 8px;font-size:11px;font-weight:600}
 
@@ -446,6 +439,8 @@
             <div class="tab" data-tab="metrics">指标对比</div>
             <div class="tab" data-tab="eval">效果评估</div>
             <div class="spacer"></div>
+            <button class="btn tabs-dec" onclick="decideBtn('keep')">保持 A</button>
+            <button class="btn primary tabs-dec" onclick="decideBtn('take')">采用 B</button>
             <span class="tabs-blind">盲评 <button class="sw" id="blindSw" onclick="toggleBlind()" title="隐藏哪版是实验版，避免打分偏见"></button></span>
           </div>
           <div class="eval-body">
@@ -768,7 +763,13 @@ let blind = false;
 function toggleBlind(){
   blind=!blind;
   const sw=document.getElementById('blindSw'); if(sw) sw.classList.toggle('on',blind);
+  document.querySelectorAll('.tabs-dec').forEach(b=>b.disabled=blind);
   renderCenter();
+}
+function decideBtn(which){
+  if(blind){ toast('盲评中先评完，揭盲后再做决策'); return; }
+  const model = document.querySelector('.nav-sub.active') && document.querySelector('.nav-sub.active').dataset.mode==='model';
+  decide(which==='keep' ? (model?'保持 hy3':'保持 A') : (model?'采用 hy4':'采用 B'));
 }
 
 /* ---------------- render ---------------- */
@@ -939,13 +940,6 @@ function renderCenter(){
         </div>
       </div>`;
   } else {
-    const model = document.querySelector('.nav-sub.active') && document.querySelector('.nav-sub.active').dataset.mode==='model';
-    const decRow = blind
-      ? `<div class="dec-row"><span class="dec-l">盲评中不做决策——评完关掉盲评再定。</span></div>`
-      : `<div class="dec-row"><span class="dec-l">评完做决策，写入版本记录</span>
-           <button class="btn" onclick="decide('${model?'保持 hy3':'保持 A'}')">保持 A</button>
-           <button class="btn primary" onclick="decide('${model?'采用 hy4':'采用 B'}')">采用 B</button>
-         </div>`;
     el.innerHTML = `
       <div class="eval-grid">
         <div class="panel">
@@ -958,14 +952,9 @@ function renderCenter(){
         <div class="panel">
           <div class="panel-h">人评 <span class="muted" style="font-weight:500">当前 case</span></div>
           <div class="panel-b">
-            <div class="score-row"><span>整体倾向</span><span class="radio">${blind?'<span>○ 甲更好</span><span class="on">● 乙更好</span><span>○ 相当</span>':'<span>○ A 更好</span><span class="on">● B 更好</span><span>○ 相当</span>'}</span></div>
-            ${blind?'<div class="sub" style="margin:2px 0 8px">盲评中：已隐藏哪版是实验版。</div>':''}
-            <div class="score-row"><span>是否守分寸</span><span class="radio"><span class="on">● 是</span><span>○ 否</span></span></div>
-            <div class="score-row"><span>是否越红线</span><span class="radio"><span>○ 是</span><span class="on">● 否</span></span></div>
-            <div class="hi-label" style="margin-top:12px">评语</div>
+            <div class="hi-label">评语</div>
             <textarea class="hi-ta" oninput="syncComment(this.value)" placeholder="主观评价，如：B 更亲和、信息更全，但偏啰嗦、成本涨得多">${esc(hiComment)}</textarea>
             <button class="btn primary hi-full" onclick="toast('已提交人工评价')">提交评价</button>
-            ${decRow}
           </div>
         </div>
       </div>`;
