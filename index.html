@@ -104,10 +104,17 @@
   .mode-pane{flex:1;display:flex;flex-direction:column;min-height:0}
   .mode-pane[hidden]{display:none}
   /* 结论卡 */
-  .tabs-blind{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--text-2);flex:0 0 auto}
-  .dec-row{display:flex;align-items:center;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border-2)}
-  .dec-row .dec-l{font-size:12px;color:var(--text-3);flex:1}
-  .dec-row .btn{padding:5px 12px;font-size:12px}
+  .verdict{display:flex;align-items:center;gap:14px;padding:11px 20px;border-bottom:1px solid var(--border-2);background:rgba(255,255,255,.7);backdrop-filter:blur(12px);flex-wrap:wrap}
+  .v-tag{font-size:11px;font-weight:700;border-radius:7px;padding:2px 9px;flex:0 0 auto}
+  .v-tag.warn{background:rgba(255,159,10,.16);color:#c2740a}
+  .v-tag.good{background:var(--good-soft);color:var(--good)}
+  .v-main{font-weight:600;font-size:13px;flex:0 0 auto}
+  .v-reason{font-size:12px;color:var(--text-2);flex:1;min-width:200px}
+  .v-act{display:flex;gap:8px;flex:0 0 auto}
+  .v-act .btn{padding:5px 12px;font-size:12px}
+  @keyframes vflash{0%{background:var(--accent-soft)}100%{background:rgba(255,255,255,.7)}}
+  .verdict.flash{animation:vflash .9s ease}
+  .v-blind{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--text-2);flex:0 0 auto;margin-left:auto}
   .wb-main{flex:1;display:flex;overflow:hidden;min-height:0}
   .strategy-region{flex:0 0 300px;width:300px;overflow:auto;padding:16px 16px;border-right:1px solid var(--border);background:var(--surface)}
   .strategy-region .panel{border:0;box-shadow:none;background:transparent;border-radius:0}
@@ -305,10 +312,6 @@
   th.c,td.c{text-align:center;font-variant-numeric:tabular-nums}
   .bar{height:6px;border-radius:4px;background:rgba(0,0,0,.06);position:relative;margin-top:4px;overflow:hidden}
   .bar>span{position:absolute;left:0;top:0;bottom:0;border-radius:4px}
-  .worse-list{margin:0;padding:0;list-style:none}
-  .worse-list li{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border-2);font-size:12.5px}
-  .worse-list li:last-child{border-bottom:0}
-
   /* eval */
   .eval-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
   .score-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border-2)}
@@ -417,6 +420,7 @@
                 <span class="only-chg" id="onlyChgBtn" onclick="toggleOnlyChanged()">只看改动</span>
               </div>
               <div id="modlist"></div>
+              <button class="btn" style="width:100%;margin-top:8px" onclick="resetB()">B 全部重置为基线（从 A fork）</button>
               <button class="btn primary" style="width:100%;margin-top:8px" onclick="toast('已把实验版 B 存入策略库')">存为新版本到策略库</button>
             </div>
           </div>
@@ -442,6 +446,7 @@
 
         <!-- ===== 评估区（右，两模式共用） ===== -->
         <section class="eval-region">
+          <div class="verdict" id="verdict"></div>
           <div class="wb-tabs" id="wbtabs">
             <div class="tab active" data-tab="interact">交互对比</div>
             <div class="tab" data-tab="stratdiff" data-mode-only="harness">策略对比</div>
@@ -449,8 +454,6 @@
             <div class="tab" data-tab="trace">轨迹对比</div>
             <div class="tab" data-tab="metrics">指标对比</div>
             <div class="tab" data-tab="eval">效果评估</div>
-            <div class="spacer"></div>
-            <span class="tabs-blind">盲评 <button class="sw" id="blindSw" onclick="toggleBlind()" title="隐藏哪版是实验版，避免打分偏见"></button></span>
           </div>
           <div class="eval-body">
             <div class="col-center" id="centerpane"></div>
@@ -750,6 +753,7 @@ function renderLib(){
         <button class="${libMode==='edit'?'on':''}" onclick="setLibMode('edit')">编辑</button>
         <button class="${libMode==='diff'?'on':''}" onclick="setLibMode('diff')">改前后对比</button>
       </div>
+      <button class="btn" onclick="toast('已 fork 出实验分支')">fork</button>
       <button class="btn primary" onclick="toast('已保存为新版本')">保存新版本</button>
     </div>
     <div class="lib-body">
@@ -769,11 +773,7 @@ let client = 'wechat';
 let tab = 'interact';
 let onlyChanged = false;
 let blind = false;
-function toggleBlind(){
-  blind=!blind;
-  const sw=document.getElementById('blindSw'); if(sw) sw.classList.toggle('on',blind);
-  renderCenter();
-}
+function toggleBlind(){ blind=!blind; renderCenter(); renderVerdict(); }
 
 /* ---------------- render ---------------- */
 function renderModules(){
@@ -791,6 +791,7 @@ function renderModules(){
     </div>`;
   }).join('')) || '<div class="sub">当前无改动模块（A=B）。</div>';
 }
+function resetB(){ modules.forEach(m=>m.verB=m.verA); renderModules(); toast('已把 B 全部重置为基线（从 A fork），再逐个改 B'); }
 function toggleOnlyChanged(){ onlyChanged=!onlyChanged; const b=document.getElementById('onlyChgBtn'); if(b) b.classList.toggle('on',onlyChanged); renderModules(); }
 function setVer(id,side,v){
   const m=modules.find(x=>x.id===id); if(!m) return;
@@ -941,27 +942,8 @@ function renderCenter(){
             <tbody>${rows}</tbody>
           </table>
         </div>
-      </div>
-      <div class="panel" style="margin-top:14px">
-        <div class="panel-h">恶化排序 <span class="muted" style="font-weight:500">B 相对 A 变差的地方</span></div>
-        <div class="panel-b">
-          <ul class="worse-list">
-            <li><span>任务完成耗时</span><span class="delta bad">▼ +0.94s</span></li>
-            <li><span>首字延迟 TTFT</span><span class="delta bad">▼ +0.3s</span></li>
-            <li><span>Token 消耗</span><span class="delta bad">▼ +378</span></li>
-            <li><span>工具调用数</span><span class="delta bad">▼ +1（多一次联网）</span></li>
-          </ul>
-          <div class="sub" style="margin-top:10px">结论：B 更慢、更贵、多调一次工具；内容是否更好，看交互对话与人工评语（机评后期接入）。</div>
-        </div>
       </div>`;
   } else {
-    const model = document.querySelector('.nav-sub.active') && document.querySelector('.nav-sub.active').dataset.mode==='model';
-    const decRow = blind
-      ? `<div class="dec-row"><span class="dec-l">盲评中不做决策——评完关掉盲评再定。</span></div>`
-      : `<div class="dec-row"><span class="dec-l">评完做决策，写入版本记录</span>
-           <button class="btn" onclick="decide('${model?'保持 hy3':'保持 A'}')">保持 A</button>
-           <button class="btn primary" onclick="decide('${model?'采用 hy4':'采用 B'}')">采用 B</button>
-         </div>`;
     el.innerHTML = `
       <div class="eval-grid">
         <div class="panel">
@@ -981,7 +963,6 @@ function renderCenter(){
             <div class="hi-label" style="margin-top:12px">评语</div>
             <textarea class="hi-ta" oninput="syncComment(this.value)" placeholder="主观评价，如：B 更亲和、信息更全，但偏啰嗦、成本涨得多">${esc(hiComment)}</textarea>
             <button class="btn primary hi-full" onclick="toast('已提交人工评价')">提交评价</button>
-            ${decRow}
           </div>
         </div>
       </div>`;
@@ -1037,6 +1018,22 @@ document.getElementById('nav').addEventListener('click',e=>{
   document.getElementById('screen-'+it.dataset.screen).classList.add('active');
 });
 
+function renderVerdict(){
+  const el=document.getElementById('verdict'); if(!el) return;
+  const blindCtl = `<span class="v-blind">盲评 <button class="sw ${blind?'on':''}" onclick="toggleBlind()" title="隐藏哪版是实验版，避免打分偏见"></button></span>`;
+  if(blind){
+    el.innerHTML = `<span class="v-tag warn">盲评中</span><span class="v-reason">已隐藏哪版是实验版——先在效果评估里给「甲 / 乙」打分，评完关闭盲评再看结论。</span>${blindCtl}`;
+    return;
+  }
+  const model = document.querySelector('.nav-sub.active') && document.querySelector('.nav-sub.active').dataset.mode==='model';
+  el.innerHTML = (model
+    ? `<span class="v-tag good">B 略优</span><span class="v-main">模型 B · hy4</span>
+       <span class="v-reason">逐 case 略优（订票确认门、记忆冲突处理更好），首字/耗时更快；Token 略高，兜底一条 A 更稳。</span>
+       <div class="v-act"><button class="btn" onclick="decide('保持 hy3')">保持 A</button><button class="btn primary" onclick="decide('采用 hy4')">采用 B</button></div>`
+    : `<span class="v-tag warn">需权衡</span><span class="v-main">B 实验版 v1.3.0</span>
+       <span class="v-reason">质量倾向 B（更完整、亲和），但代价：延迟 +76% · Token +44% · 多调 1 次工具。</span>
+       <div class="v-act"><button class="btn" onclick="decide('保持 A')">保持 A</button><button class="btn primary" onclick="decide('采用 B')">采用 B</button></div>`) + blindCtl;
+}
 function decide(d){
   const tb=document.getElementById('verlog');
   if(tb){
@@ -1052,6 +1049,7 @@ function setMode(m){
   const ph=document.getElementById('panel-harness'), pm=document.getElementById('panel-model');
   if(ph) ph.hidden = (m!=='harness');
   if(pm) pm.hidden = (m!=='model');
+  renderVerdict();
   document.querySelectorAll('#wbtabs .tab[data-mode-only]').forEach(t=>{ t.hidden = (t.dataset.modeOnly!==m); });
   const active=document.querySelector('#wbtabs .tab.active');
   if(active && active.hidden){
@@ -1124,9 +1122,10 @@ function finishRun(){
   runBtn.classList.remove('stop'); runBtn.classList.add('primary');
   runBtn.textContent='开始运行'; runBtn.disabled=false;   // 跑完可反复跑
   resetIndicator();
-  renderCenter(); renderRail();
+  renderCenter(); renderRail(); renderVerdict();
+  const v=document.getElementById('verdict'); if(v){ v.classList.remove('flash'); void v.offsetWidth; v.classList.add('flash'); }
   archiveExperiment();
-  toast('运行完成 · 已存档到版本记录');
+  toast('运行完成 · 已存档到版本记录 · 结论见顶部');
 }
 runBtn.addEventListener('click',()=>{
   if(running){ stopRun(); return; }
@@ -1151,7 +1150,7 @@ function caseStep(d){
 }
 
 /* init */
-renderModules(); renderCenter(); renderRail(); renderLib(); updateCaseProg();
+renderModules(); renderCenter(); renderRail(); renderLib(); renderVerdict(); updateCaseProg();
 </script>
 </body>
 </html>
