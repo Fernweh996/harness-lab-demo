@@ -165,8 +165,9 @@
   .cb-btn.bad:hover{border-color:var(--bad);color:var(--bad)}
   .chat-in{border-top:1px solid var(--border-2);padding:9px 12px;display:flex;gap:8px;align-items:center;color:var(--text-3);font-size:12px}
   .chat-in .chat-snd{margin-left:auto;background:var(--good);color:#fff;border:0;border-radius:8px;padding:5px 13px;font-size:12px;font-weight:600}
-  /* 交互对比：两个手机聊天界面并排，各自完整收发 */
-  .pwrap{display:flex;gap:20px;height:100%;align-items:stretch}
+  /* 交互对比：两个聊天窗并排，底部共享一个输入框（发送后两边同时收到） */
+  .ichat{display:flex;flex-direction:column;height:100%;gap:14px}
+  .pwrap{display:flex;gap:20px;flex:1;min-height:0;align-items:stretch}
   .pchat{flex:1;min-width:0;display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--border-2);border-radius:18px;box-shadow:var(--shadow);overflow:hidden}
   .pc-bar{flex:0 0 auto;text-align:center;font-size:12px;font-weight:600;color:var(--text-2);padding:12px;border-bottom:1px solid var(--border-2);background:var(--surface-2);display:flex;align-items:center;justify-content:center;gap:7px}
   .pc-bar .dot{width:6px;height:6px;border-radius:50%;background:var(--text-3);flex:0 0 auto}
@@ -180,8 +181,10 @@
   .pm.bot:hover .cb-act,.cmsg:hover .cb-act{display:flex}
   .pc-input{flex:0 0 auto;margin:10px 12px 12px;padding:7px 7px 7px 12px;display:flex;gap:8px;align-items:center;color:var(--text-3);font-size:12px;background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,.07)}
   .pc-input .ci-plus{flex:0 0 auto;width:22px;height:22px;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:15px;line-height:1;color:var(--text-3)}
-  .pc-input .ci-ph{flex:1;min-width:0}
+  .pc-input .ci-in{flex:1;min-width:0;border:0;outline:0;background:transparent;font-family:inherit;font-size:12.5px;color:var(--text)}
+  .pc-input .ci-in::placeholder{color:var(--text-3)}
   .pc-input .pc-snd{flex:0 0 auto;margin-left:auto;background:var(--text);color:#fff;border:0;border-radius:50%;width:28px;height:28px;padding:0;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .pc-input-shared{flex:0 0 auto;margin:0}
   .p-divider{flex:0 0 1px;align-self:stretch;background:var(--border-2)}
   /* 轨迹对比：每条 query 背后 agent 的 todo + 思维链 */
   .tr-q{background:var(--accent-soft);border-radius:12px;padding:9px 14px;font-size:12.5px;color:var(--text);margin-bottom:14px}
@@ -994,12 +997,22 @@ function phoneCol(conv, tag, label){
   return `<div class="pchat">
     <div class="pc-bar"><span class="dot"></span>${label}</div>
     <div class="pc-body">${body}</div>
-    <div class="pc-input"><span class="ci-plus">+</span><span class="ci-ph">输入消息…</span><button class="pc-snd" aria-label="发送">↑</button></div>
   </div>`;
 }
 function alignedChat(){
   const la = blind?'版本 甲':'A · 对照组', lb = blind?'版本 乙':'B · 实验组';
-  return `<div class="pwrap">${phoneCol(convA,'A',la)}<div class="p-divider"></div>${phoneCol(convB,'B',lb)}</div>`;
+  return `<div class="ichat">
+    <div class="pwrap">${phoneCol(convA,'A',la)}<div class="p-divider"></div>${phoneCol(convB,'B',lb)}</div>
+    <div class="pc-input pc-input-shared"><span class="ci-plus">+</span><input class="ci-in" id="sharedMsg" placeholder="输入消息…（发送后 A / B 同时收到）" onkeydown="if(event.key==='Enter')sendBoth()"><button class="pc-snd" onclick="sendBoth()" aria-label="发送">↑</button></div>
+  </div>`;
+}
+function sendBoth(){
+  const inp=document.getElementById('sharedMsg'); if(!inp) return;
+  const text=inp.value.trim(); if(!text) return;
+  convA.push({role:'user',text}); convA.push({role:'bot',text:'已收到，A 版按基线策略作答。'});
+  convB.push({role:'user',text}); convB.push({role:'bot',text:'收到啦～B 版按实验策略作答 😊'});
+  renderCenter();
+  toast('已向 A / B 同时发送');
 }
 
 function renderCenter(){
