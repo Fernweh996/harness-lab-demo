@@ -421,9 +421,9 @@
           <div class="panel">
             <div class="panel-h">策略区 · 装配 <span class="muted" style="font-weight:500">实验版 B</span></div>
             <div class="panel-b">
-              <div class="sub" style="display:flex;justify-content:space-between;align-items:center">
-                <span>Harness 模块 <span style="color:var(--text-3);font-weight:400">（A=基线锁定，只调 B）</span></span>
-                <span class="only-chg" id="onlyChgBtn" onclick="toggleOnlyChanged()">只看改动</span>
+              <div class="sub" style="display:flex;justify-content:space-between;align-items:center;gap:6px;white-space:nowrap;font-size:10px">
+                <span style="white-space:nowrap">Harness 模块 <span style="color:var(--text-3);font-weight:400">（A=基线锁定，只调 B）</span></span>
+                <span class="only-chg" id="onlyChgBtn" onclick="toggleOnlyChanged()" style="flex:0 0 auto;white-space:nowrap;font-size:10px">只看改动</span>
               </div>
               <div id="modlist"></div>
               <button class="btn" style="width:100%;margin-top:8px" onclick="resetB()">B 全部重置为基线（从 A fork）</button>
