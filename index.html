@@ -163,25 +163,27 @@
   .cb{background:var(--surface-2);border:1px solid var(--border-2);border-radius:12px;padding:9px 12px;font-size:12.5px;line-height:1.55;color:var(--text)}
   .cmsg.user .cb{background:var(--accent-soft);border-color:transparent}
   .cb-act{margin-top:8px;display:flex;gap:6px;opacity:0;transition:.12s}
-  .ex-bubble:hover .cb-act{opacity:1}
   .cb-btn{border:1px solid var(--border);background:#fff;border-radius:7px;padding:2px 9px;font-size:11px;color:var(--text-2)}
   .cb-btn.good:hover{border-color:var(--good);color:var(--good)}
   .cb-btn.bad:hover{border-color:var(--bad);color:var(--bad)}
   .chat-in{border-top:1px solid var(--border-2);padding:9px 12px;display:flex;gap:8px;align-items:center;color:var(--text-3);font-size:12px}
   .chat-in .chat-snd{margin-left:auto;background:var(--good);color:#fff;border:0;border-radius:8px;padding:5px 13px;font-size:12px;font-weight:600}
-  /* 交互对比：按轮左右对齐 */
-  .xchat{height:100%;display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--border-2);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
-  .ex-hd{display:flex;gap:20px;padding:14px 20px;border-bottom:1px solid var(--border-2);position:sticky;top:0;background:var(--surface);z-index:1}
-  .ex-hcol{flex:1;font-size:12px;font-weight:600;color:var(--text-2);display:flex;align-items:center;gap:7px}
-  .ex-hcol .dot{width:6px;height:6px;border-radius:50%;background:var(--text-3);flex:0 0 auto}
-  .xbody{flex:1;overflow:auto;padding:20px;display:flex;flex-direction:column;gap:8px}
-  .ex-qrow{display:flex;justify-content:center;margin:8px 0 4px}
-  .ex-qrow:first-child{margin-top:0}
-  .ex-q{max-width:82%;background:var(--accent-soft);color:var(--text);border-radius:14px;padding:9px 16px;font-size:12.5px;line-height:1.55;text-align:center}
-  .ex-q .qtag{display:block;font-size:10px;font-weight:600;color:var(--text-3);letter-spacing:.03em;margin-bottom:3px}
-  .ex-ab{display:flex;gap:20px;align-items:stretch;margin-bottom:6px}
-  .ex-cell{flex:1;min-width:0;display:flex}
-  .ex-bubble{position:relative;flex:1;background:var(--surface);border:1px solid var(--border-2);border-radius:14px;padding:12px 14px;font-size:12.5px;line-height:1.65;color:var(--text);box-shadow:var(--shadow)}
+  /* 交互对比：两个手机聊天界面并排，各自完整收发 */
+  .pwrap{display:flex;gap:20px;height:100%;align-items:stretch}
+  .pchat{flex:1;min-width:0;display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--border-2);border-radius:18px;box-shadow:var(--shadow);overflow:hidden}
+  .pc-bar{flex:0 0 auto;text-align:center;font-size:12px;font-weight:600;color:var(--text-2);padding:12px;border-bottom:1px solid var(--border-2);background:var(--surface-2);display:flex;align-items:center;justify-content:center;gap:7px}
+  .pc-bar .dot{width:6px;height:6px;border-radius:50%;background:var(--text-3);flex:0 0 auto}
+  .pc-body{flex:1;overflow:auto;padding:16px 14px;display:flex;flex-direction:column;gap:12px;background:var(--bg)}
+  .pm{display:flex;max-width:88%}
+  .pm.user{align-self:flex-end}
+  .pm.bot{align-self:flex-start}
+  .pb{position:relative;padding:10px 13px;border-radius:16px;font-size:12.5px;line-height:1.6}
+  .pm.bot .pb{background:var(--surface);border:1px solid var(--border-2);border-bottom-left-radius:5px;color:var(--text);box-shadow:var(--shadow)}
+  .pm.user .pb{background:var(--accent);color:#fff;border-bottom-right-radius:5px}
+  .pb:hover .cb-act{opacity:1}
+  .pc-input{flex:0 0 auto;border-top:1px solid var(--border-2);padding:10px 12px;display:flex;gap:8px;align-items:center;color:var(--text-3);font-size:12px;background:var(--surface)}
+  .pc-input span{flex:1}
+  .pc-input .pc-snd{background:var(--good);color:#fff;border:0;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600}
   /* 推理链路（横向） */
   .chain-cols{display:flex;gap:16px;align-items:flex-start}
   .chain-col{flex:1;min-width:0;background:var(--surface);border:1px solid var(--border-2);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 16px}
@@ -828,26 +830,26 @@ function chatFlow(conv, tag){
     <div class="chat-in">输入消息…<button class="chat-snd">发送</button></div></div>`;
 }
 function saveCase(tag,kind){ toast('已存为 '+(kind==='good'?'good':'bad')+'case（query + '+tag+' 版输出）到 Case 库'); }
-function exBubble(text,tag){
-  return `<div class="ex-bubble">${text}
-    <div class="cb-act"><button class="cb-btn good" onclick="saveCase('${tag}','good')">👍 存 goodcase</button><button class="cb-btn bad" onclick="saveCase('${tag}','bad')">👎 存 badcase</button></div>
+function phoneCol(conv, tag, label){
+  let body='';
+  for(const t of conv){
+    if(t.role==='user'){
+      body+=`<div class="pm user"><div class="pb">${t.text}</div></div>`;
+    }else{
+      body+=`<div class="pm bot"><div class="pb">${t.text}
+        <div class="cb-act"><button class="cb-btn good" onclick="saveCase('${tag}','good')">👍 存 goodcase</button><button class="cb-btn bad" onclick="saveCase('${tag}','bad')">👎 存 badcase</button></div>
+      </div></div>`;
+    }
+  }
+  return `<div class="pchat">
+    <div class="pc-bar"><span class="dot"></span>${label}</div>
+    <div class="pc-body">${body}</div>
+    <div class="pc-input"><span>输入消息…</span><button class="pc-snd">发送</button></div>
   </div>`;
 }
 function alignedChat(){
-  let rows='';
-  for(let i=0;i<convA.length;i++){
-    if(convA[i].role==='user'){
-      rows+=`<div class="ex-qrow"><div class="ex-q"><span class="qtag">用户提问</span>${convA[i].text}</div></div>`;
-    }else{
-      rows+=`<div class="ex-ab"><div class="ex-cell">${exBubble(convA[i].text,'A')}</div><div class="ex-cell">${exBubble((convB[i]||{}).text||'','B')}</div></div>`;
-    }
-  }
   const la = blind?'版本 甲':'A · 对照组', lb = blind?'版本 乙':'B · 实验组';
-  return `<div class="xchat">
-    <div class="ex-hd"><div class="ex-hcol"><span class="dot"></span>${la}</div><div class="ex-hcol"><span class="dot"></span>${lb}</div></div>
-    <div class="xbody">${rows}</div>
-    <div class="chat-in">输入消息…<button class="chat-snd">发送</button></div>
-  </div>`;
+  return `<div class="pwrap">${phoneCol(convA,'A',la)}${phoneCol(convB,'B',lb)}</div>`;
 }
 
 function renderCenter(){
