@@ -1011,10 +1011,10 @@ function renderVerdict(){
   el.innerHTML = (model
     ? `<span class="v-tag good">B 略优</span><span class="v-main">模型 B · hy4</span>
        <span class="v-reason">逐 case 略优（订票确认门、记忆冲突处理更好），首字/耗时更快；Token 略高，兜底一条 A 更稳。</span>
-       <div class="v-act"><button class="btn primary" onclick="decide('采用 hy4')">采用 B</button><button class="btn" onclick="decide('保持 hy3')">保持 A</button><button class="btn" onclick="decide('再评')">再评</button></div>`
+       <div class="v-act"><button class="btn" onclick="decide('保持 hy3')">保持 A</button><button class="btn primary" onclick="decide('采用 hy4')">采用 B</button></div>`
     : `<span class="v-tag warn">需权衡</span><span class="v-main">B 实验版 v1.3.0</span>
        <span class="v-reason">质量倾向 B（更完整、亲和），但代价：延迟 +76% · Token +44% · 多调 1 次工具。</span>
-       <div class="v-act"><button class="btn primary" onclick="decide('采用 B')">采用 B</button><button class="btn" onclick="decide('保持 A')">保持 A</button><button class="btn" onclick="decide('再评')">再评</button></div>`) + blindCtl;
+       <div class="v-act"><button class="btn" onclick="decide('保持 A')">保持 A</button><button class="btn primary" onclick="decide('采用 B')">采用 B</button></div>`) + blindCtl;
 }
 function decide(d){
   const tb=document.getElementById('verlog');
