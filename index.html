@@ -182,27 +182,26 @@
   .pc-input .ci-ph{flex:1;min-width:0}
   .pc-input .pc-snd{flex:0 0 auto;margin-left:auto;background:var(--text);color:#fff;border:0;border-radius:50%;width:28px;height:28px;padding:0;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center}
   .p-divider{flex:0 0 1px;align-self:stretch;background:var(--border-2)}
-  /* 推理链路（横向） */
-  .chain-cols{display:flex;gap:16px;align-items:flex-start}
-  .chain-col{flex:1;min-width:0;background:var(--surface);border:1px solid var(--border-2);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 16px}
-  .chain-head{font-weight:600;font-size:13px;margin-bottom:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-  .chain{display:flex;flex-direction:column}
-  .ch-node{border:1px solid var(--border);border-radius:12px;padding:9px 11px;background:var(--surface)}
-  .ch-node.diff{border-color:var(--blue);background:var(--accent-soft)}
-  .ch-l{font-weight:600;font-size:12px;color:var(--text)}
-  .ch-node.diff .ch-l{color:var(--accent-2)}
-  .ch-s{font-size:10.5px;color:var(--text-3);margin-top:3px;line-height:1.4}
-  .ch-d{font-size:10px;color:var(--text-3);margin-top:5px;font-variant-numeric:tabular-nums}
-  .ch-arrow{align-self:center;color:var(--text-3);padding:3px 0;font-size:13px}
-  /* 轨迹对比：A/B 逐步对齐 diff */
-  .chain-diff{background:var(--surface);border:1px solid var(--border-2);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px}
-  .ch-hd{display:flex;gap:14px;margin-bottom:12px}
-  .ch-hc{flex:1;font-weight:600;font-size:12.5px}
-  .ch-row{display:flex;gap:14px}
-  .ch-c{flex:1;min-width:0}
-  .ch-arrow2{display:flex;gap:14px}
-  .ch-arrow2>span{flex:1;text-align:center;color:var(--text-3);font-size:13px;padding:3px 0}
-  .ch-empty{border-style:dashed !important;color:var(--text-3);text-align:center;background:transparent !important}
+  /* 轨迹对比：每条 query 背后 agent 的 todo + 思维链 */
+  .tr-q{background:var(--accent-soft);border-radius:12px;padding:9px 14px;font-size:12.5px;color:var(--text);margin-bottom:14px}
+  .tr-q .tq-k{font-size:10px;font-weight:600;color:var(--text-3);margin-right:8px}
+  .tr-wrap{display:flex;gap:20px;align-items:stretch}
+  .tr-col{flex:1;min-width:0;background:var(--surface);border:1px solid var(--border-2);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px}
+  .tr-hd{font-weight:600;font-size:12.5px;display:flex;align-items:center;gap:7px;margin-bottom:6px}
+  .tr-hd .dot{width:6px;height:6px;border-radius:50%;background:var(--text-3);flex:0 0 auto}
+  .tr-sec{font-size:10.5px;font-weight:600;color:var(--text-3);letter-spacing:.04em;margin:16px 0 8px}
+  .tr-todo{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+  .tr-todo li{font-size:12.5px;color:var(--text);display:flex;gap:8px;align-items:flex-start;line-height:1.5}
+  .tr-todo li .tk{color:var(--good);flex:0 0 auto}
+  .tr-todo li.add{color:var(--accent-2);font-weight:500}
+  .tr-todo li.add .tk{color:var(--blue)}
+  .tr-think{display:flex;flex-direction:column}
+  .tr-step{border-left:2px solid var(--border);padding:8px 0 8px 12px;font-size:12px}
+  .tr-step.diff,.tr-step.add{border-left-color:var(--blue);background:var(--accent-soft);border-radius:0 8px 8px 0}
+  .tr-step .ts-k{font-weight:600;font-size:11px;color:var(--text-2);display:block;margin-bottom:2px}
+  .tr-step.diff .ts-k,.tr-step.add .ts-k{color:var(--accent-2)}
+  .tr-step .ts-t{color:var(--text);line-height:1.55}
+  .tr-step .ts-d{color:var(--text-3);font-size:10px;margin-left:6px;font-variant-numeric:tabular-nums}
   .panel{background:var(--surface);border:1px solid var(--border-2);border-radius:var(--radius);box-shadow:var(--shadow)}
   .panel-h{padding:14px 18px;border-bottom:1px solid var(--border-2);font-weight:600;font-size:13px;letter-spacing:-.01em;display:flex;align-items:center;justify-content:space-between}
   .panel-b{padding:16px 18px}
@@ -588,15 +587,36 @@ const metrics = [
 ];
 
 // 轨迹 = 推理链路，A/B 逐步对齐做 diff；diff=有差异，add=B 新增(A 无此步)
-const chainRows=[
-  {a:{l:'query',s:'用户输入'}, b:{l:'query',s:'用户输入'}},
-  {a:{l:'agent prompt',s:'system v1',d:'0.6s'}, b:{l:'agent prompt',s:'system v2',d:'0.9s'}, diff:true},
-  {a:{l:'分解',s:'规划：检索后作答'}, b:{l:'分解',s:'规划：先联网再检索'}, diff:true},
-  {a:{l:'tool · 知识库',s:'搜到 3 段',d:'0.26s'}, b:{l:'tool · 知识库',s:'搜到 3 段',d:'0.30s'}},
-  {a:null, b:{l:'tool · 联网',s:'搜到 2 条（新增）',d:'0.25s'}, add:true},
-  {a:{l:'summary',s:'汇总检索',d:'0.14s'}, b:{l:'summary',s:'汇总 检索+联网',d:'0.20s'}, diff:true},
-  {a:{l:'给用户',s:'200 字回复',d:'0.1s'}, b:{l:'给用户',s:'300 字回复',d:'0.52s'}, diff:true},
-];
+// 轨迹对比：每条 query 背后 agent 的真实执行——todo 清单 + 思维链（思考/工具/作答）
+const traceQuery = '请介绍一下你们的智能客服产品';
+const traceCompare = {
+  a:{ label:'A · 基线 v1.2.3 · hy3',
+    todo:[
+      {t:'理解用户意图（即时问答）', done:true},
+      {t:'检索知识库拿产品资料', done:true},
+      {t:'汇总并作答', done:true},
+    ],
+    think:[
+      {k:'思考', t:'属于即时问答，直接检索知识库回答即可，不必联网。'},
+      {k:'工具 · 知识库', t:'query「智能客服 产品介绍」→ 命中 3 段。', d:'0.26s'},
+      {k:'思考', t:'资料足够，按“结论先行、简洁”组织回复。'},
+      {k:'作答', t:'输出约 200 字回复。', d:'0.10s'},
+    ]},
+  b:{ label:'B · 实验 v1.3.0 · hy3',
+    todo:[
+      {t:'理解用户意图（即时问答）', done:true},
+      {t:'检索知识库拿产品资料', done:true},
+      {t:'联网补充最新能力信息', done:true, add:true},
+      {t:'汇总并作答（更完整、更亲和）', done:true},
+    ],
+    think:[
+      {k:'思考', t:'v2 策略倾向更完整：先检索知识库，再联网补最新信息。', diff:true},
+      {k:'工具 · 知识库', t:'query「智能客服 产品介绍」→ 命中 3 段。', d:'0.30s'},
+      {k:'工具 · 联网', t:'query「智能客服 最新能力 2026」→ 命中 2 条。', d:'0.25s', add:true},
+      {k:'思考', t:'综合知识库+联网，按“结论先行 + 语气随关系画像调亲和”组织。', diff:true},
+      {k:'作答', t:'输出约 300 字回复（更详实、更热情）。', d:'0.52s', diff:true},
+    ]},
+};
 
 // 策略库 mock：每个模块 = 一份可运行的策略文档
 const strategyModules = [
@@ -925,17 +945,23 @@ function phone(conv, variant){
   </div>`;
 }
 
-function renderChainDiff(){
-  let html='';
-  chainRows.forEach((r,i)=>{
-    if(i>0) html+=`<div class="ch-arrow2"><span>↓</span><span>↓</span></div>`;
-    const cls = (r.diff||r.add)?'diff':'';
-    const cell=(n)=> n
-      ? `<div class="ch-node ${cls}"><div class="ch-l">${n.l}</div><div class="ch-s">${n.s||''}</div>${n.d?`<div class="ch-d">${n.d}</div>`:''}</div>`
-      : `<div class="ch-node ch-empty">（无此步）</div>`;
-    html+=`<div class="ch-row"><div class="ch-c">${cell(r.a)}</div><div class="ch-c">${cell(r.b)}</div></div>`;
-  });
-  return html;
+function renderTraceCol(side){
+  const todo = side.todo.map(x=>`<li class="${x.add?'add':''}"><span class="tk">☑</span><span>${x.t}</span></li>`).join('');
+  const think = side.think.map(s=>{
+    const cls = s.add?'add':(s.diff?'diff':'');
+    return `<div class="tr-step ${cls}"><span class="ts-k">${s.k}${s.d?`<span class="ts-d">${s.d}</span>`:''}</span><span class="ts-t">${s.t}</span></div>`;
+  }).join('');
+  return `<div class="tr-col">
+    <div class="tr-hd"><span class="dot"></span>${side.label}</div>
+    <div class="tr-sec">AGENT TODO</div>
+    <ul class="tr-todo">${todo}</ul>
+    <div class="tr-sec">思维链</div>
+    <div class="tr-think">${think}</div>
+  </div>`;
+}
+function renderTrace(){
+  return `<div class="tr-q"><span class="tq-k">用户 query</span>${traceQuery}</div>
+    <div class="tr-wrap">${renderTraceCol(traceCompare.a)}${renderTraceCol(traceCompare.b)}</div>`;
 }
 function chatFlow(conv, tag){
   let body='';
@@ -1024,11 +1050,8 @@ function renderCenter(){
       <div class="sub" style="margin-top:10px">换模型是全局影响：逐 case 看 A/B 表现，避免只看一条就下结论。</div>`;
   } else if(tab==='trace'){
     el.innerHTML = `
-      <div class="chain-diff">
-        <div class="ch-hd"><div class="ch-hc">A · 基线 v1.2.3 · hy3 · 1.24s</div><div class="ch-hc">B · 实验 v1.3.0 · hy3 · 2.18s</div></div>
-        ${renderChainDiff()}
-        <div class="sub" style="margin-top:12px">推理链路逐步对齐 diff：蓝色 = A/B 有差异或 B 新增的步骤（v2 决定先联网 → 多一步联网搜索、生成更长）。</div>
-      </div>`;
+      ${renderTrace()}
+      <div class="sub" style="margin-top:12px">这条 query 背后 agent 的真实执行：左右各是 A / B 的 <b>agent-todo</b> 与 <b>思维链</b>（思考 → 工具 → 作答）。蓝色 = B 相对 A 新增或有差异的步骤（v2 多了一步联网、生成更完整）。</div>`;
   } else if(tab==='metrics'){
     const rows = metrics.map(m=>`
       <tr>
