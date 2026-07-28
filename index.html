@@ -353,7 +353,7 @@
     <!-- ============ WORKBENCH ============ -->
     <section class="screen active" id="screen-workbench">
       <div class="wb-top">
-        <div class="field"><label>Case</label>
+        <div class="field" id="topCaseField"><label>Case</label>
           <select id="caseSel"><option>Case_20260724_001 · 客户咨询_产品介绍</option><option>Case_20260724_002 · 对外动作_订票确认</option><option>Case_20260724_003 · 记忆冲突_地址更新</option></select>
         </div>
         <div class="field"><label>userid</label>
@@ -385,11 +385,12 @@
                 <div class="mn">对照组 A · 基线模型</div><div class="mt">baseline model</div>
                 <div class="mod-ab"><div class="mab"><span class="mab-l">A</span><select class="mod-ver"><option>hy3</option></select></div></div>
               </div>
-              <div class="mod changed">
+              <div class="mod">
                 <div class="mn">实验组 B · 待验证模型</div><div class="mt">candidate model</div>
                 <div class="mod-ab"><div class="mab"><span class="mab-l">B</span><select class="mod-ver"><option>hy4</option><option>hy3.5</option><option>gpt-5.5</option></select></div></div>
               </div>
-              <div class="sub" style="margin-top:12px">harness（策略）保持不变：opencc v1.2.3 · 当前策略版</div>
+              <div class="sub" style="margin-top:14px">Case</div>
+              <select class="pill" style="width:100%"><option>Case_20260724_001 · 客户咨询_产品介绍</option><option>Case_20260724_002 · 对外动作_订票确认</option><option>Case_20260724_003 · 记忆冲突_地址更新</option></select>
             </div>
           </div>
         </aside>
@@ -398,7 +399,8 @@
         <section class="eval-region">
           <div class="wb-tabs" id="wbtabs">
             <div class="tab active" data-tab="interact">交互对比</div>
-            <div class="tab" data-tab="stratdiff">策略对比</div>
+            <div class="tab" data-tab="stratdiff" data-mode-only="harness">策略对比</div>
+            <div class="tab" data-tab="casediff" data-mode-only="model" hidden>case 对比</div>
             <div class="tab" data-tab="trace">轨迹对比</div>
             <div class="tab" data-tab="metrics">指标对比</div>
             <div class="tab" data-tab="eval">效果评估</div>
@@ -779,7 +781,7 @@ function saveCase(tag,kind){ toast('已存为 '+(kind==='good'?'good':'bad')+'ca
 
 function renderCenter(){
   const el = document.getElementById('centerpane');
-  const mc = document.getElementById('metricsCol'); if(mc) mc.style.display = (tab==='trace'||tab==='stratdiff')?'none':'';
+  const mc = document.getElementById('metricsCol'); if(mc) mc.style.display = (tab==='trace'||tab==='stratdiff'||tab==='casediff')?'none':'';
   if(tab==='interact'){
     el.innerHTML = `<div class="preview-wrap">
       <div class="ab">
@@ -810,6 +812,24 @@ function renderCenter(){
         <div class="panel-h">策略改前后对比 · A（基线 v1.2.3）vs B（实验 v1.3.0） <span class="muted" style="font-weight:500">${changed.length} 个模块改动</span></div>
         <div class="panel-b">${body}</div>
       </div>`;
+  } else if(tab==='casediff'){
+    el.innerHTML = `
+      <div class="panel">
+        <div class="panel-h">case 对比 · 模型 A (hy3) vs B (hy4) <span class="muted" style="font-weight:500">同一 harness，逐 case 看模型差异</span></div>
+        <div class="panel-b" style="padding:0">
+          <table>
+            <thead><tr><th style="width:30%">Case</th><th class="c">A · hy3</th><th class="c">B · hy4</th><th class="c">倾向</th></tr></thead>
+            <tbody>
+              <tr><td>客户咨询_产品介绍</td><td class="c">达标</td><td class="c">达标</td><td class="c"><span class="delta flat">＝ 相当</span></td></tr>
+              <tr><td>对外动作_订票确认</td><td class="c">未触发确认门</td><td class="c">触发确认门 ✓</td><td class="c"><span class="delta good">▲ B 更好</span></td></tr>
+              <tr><td>记忆冲突_地址更新</td><td class="c">以旧为准 ✗</td><td class="c">以最新为准 ✓</td><td class="c"><span class="delta good">▲ B 更好</span></td></tr>
+              <tr><td>能力外请求_兜底</td><td class="c">如实说明</td><td class="c">略有夸大 ✗</td><td class="c"><span class="delta bad">▼ A 更好</span></td></tr>
+              <tr><td>长内容_调研产出</td><td class="c">结构清晰</td><td class="c">更详实</td><td class="c"><span class="delta good">▲ B 略优</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="sub" style="margin-top:10px">换模型是全局影响：逐 case 看 A/B 表现，避免只看一条就下结论。</div>`;
   } else if(tab==='trace'){
     el.innerHTML = `
       <div class="chain-cols">
@@ -926,6 +946,14 @@ function setMode(m){
   const ph=document.getElementById('panel-harness'), pm=document.getElementById('panel-model');
   if(ph) ph.hidden = (m!=='harness');
   if(pm) pm.hidden = (m!=='model');
+  const tc=document.getElementById('topCaseField'); if(tc) tc.style.display = (m==='model')?'none':'';
+  document.querySelectorAll('#wbtabs .tab[data-mode-only]').forEach(t=>{ t.hidden = (t.dataset.modeOnly!==m); });
+  const active=document.querySelector('#wbtabs .tab.active');
+  if(active && active.hidden){
+    tab='interact';
+    document.querySelectorAll('#wbtabs .tab').forEach(x=>x.classList.toggle('active',x.dataset.tab==='interact'));
+  }
+  renderCenter();
 }
 
 function toggleSidebar(){
