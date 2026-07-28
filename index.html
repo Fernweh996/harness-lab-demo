@@ -67,9 +67,10 @@
   .sidebar.collapsed .side-foot{display:none}
 
   /* ---------- main ---------- */
-  .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
-  .screen{flex:1;overflow:auto;display:none}
+  .main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0}
+  .screen{flex:1;overflow:auto;display:none;min-height:0}
   .screen.active{display:flex;flex-direction:column}
+  #screen-workbench{overflow:hidden}
 
   /* ---------- workbench top ---------- */
   .wb-top{background:rgba(255,255,255,.7);backdrop-filter:blur(12px);border-bottom:1px solid var(--border-2);padding:12px 22px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
