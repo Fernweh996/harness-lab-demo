@@ -512,7 +512,7 @@
           <table>
             <thead><tr><th>版本</th><th>改动模块</th><th>改了什么 / 决策</th><th>修改人</th><th>时间</th></tr></thead>
             <tbody id="verlog">
-              <tr><td>v1.3.0 <span class="tagx exp">实验</span></td><td>Prompt / Memory / Hooks</td><td>换 prompt v2；memory topK 3→5；关闭消息分组</td><td>小鱼（产品）</td><td>2026-07-27 11:20</td></tr>
+              <tr><td>v1.3.0 <span class="tagx exp">实验</span></td><td>Prompt / Memory</td><td>换 prompt v2；memory topK 3→5</td><td>小鱼（产品）</td><td>2026-07-27 11:20</td></tr>
               <tr><td>v1.2.3 <span class="tagx base">基线</span></td><td>Prompt</td><td>调 prompt 模板 v1</td><td>阿哲（算法）</td><td>2026-07-20 15:04</td></tr>
               <tr><td>v1.2.0</td><td>Memory</td><td>召回阈值 0.85→0.82</td><td>阿哲（算法）</td><td>2026-07-12 10:30</td></tr>
               <tr><td>v1.0.0</td><td>全部</td><td>初始版本</td><td>算法团队</td><td>2026-06-28 09:00</td></tr>
@@ -547,7 +547,8 @@ const modules = [
   {id:'tools',   name:'Tools / 工具',         type:'toolset',       versions:['v1.2.3'], verA:'v1.2.3', verB:'v1.2.3'},
   {id:'output',  name:'Output / 输出呈现',    type:'output',        versions:['v1.2.3'], verA:'v1.2.3', verB:'v1.2.3'},
   {id:'guard',   name:'Guardrails / 护栏',    type:'guardrails',    versions:['v1.2.3'], verA:'v1.2.3', verB:'v1.2.3'},
-  {id:'hooks',   name:'Hooks / 扩展',         type:'hooks',         versions:['v1.3.0','v1.2.3'], verA:'v1.2.3', verB:'v1.3.0'},
+  // Hooks / 扩展 模块暂无相应策略，暂不启用（如需恢复取消本行注释）
+  // {id:'hooks',   name:'Hooks / 扩展',         type:'hooks',         versions:['v1.3.0','v1.2.3'], verA:'v1.2.3', verB:'v1.3.0'},
 ];
 
 const convA = [
@@ -652,6 +653,7 @@ const strategyModules = [
 ## 回执
 - 做事类输出要有回执，长任务要有过程反馈。`},
 
+  /* Hooks 模块暂无相应策略，暂不启用（如需恢复删除本段注释）
   {id:'hooks', name:'Hooks / 主动消息', type:'hooks', version:'v1.3.0', tags:['实验'], changed:true, source:
 `# 主动消息 · Hooks
 
@@ -670,6 +672,7 @@ const strategyModules = [
 ## 频控
 - 低频、可忽略、可降权。
 - 忽略 1 次进 7 天冷却；连续忽略 2 次仅在新证据时触发。`},
+  */
 
   {id:'guardrails', name:'Guardrails / 护栏', type:'guardrails', version:'v1.2.3', tags:['基线'], changed:false, source:
 `# 护栏 · Guardrails
@@ -688,7 +691,7 @@ const strategyModules = [
 const moduleDiffs = {
   prompt:[{ctx:'## 风格'},{del:'- 语气统一专业、简洁，200 字以内'},{add:'+ 结论先行，短回复不堆结构'},{add:'+ 语气随关系画像调浓淡（v2）'}],
   memory:[{ctx:'## 召回'},{del:'- topK = 3，阈值 0.82'},{add:'+ topK = 5，阈值 0.80'},{add:'+ 增加背景召回'}],
-  hooks:[{ctx:'## 消息分组'},{del:'- enabled: true'},{add:'+ enabled: false（本版关闭分组）'}],
+  // hooks:[{ctx:'## 消息分组'},{del:'- enabled: true'},{add:'+ enabled: false（本版关闭分组）'}],  // Hooks 暂不启用
 };
 let libSel='prompt', libMode='preview';
 function renderDiff(m){
