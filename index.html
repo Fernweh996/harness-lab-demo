@@ -197,6 +197,7 @@
   .mab{flex:1;display:flex;align-items:center;gap:5px;min-width:0}
   .mab-l{font-size:10px;font-weight:700;color:var(--text-3);flex:0 0 auto}
   .mab .mod-ver{flex:1;min-width:0}
+  .mod-lock{flex:1;min-width:0;border:1px solid var(--border-2);border-radius:8px;padding:5px 8px;font-size:11px;color:var(--text-3);background:var(--surface-2)}
   .mod.changed .mn::after{content:"● 改";color:var(--blue);margin-left:6px;font-size:9.5px;vertical-align:middle;font-weight:600}
   .sw{width:42px;height:25px;border-radius:25px;background:#e9e9ea;position:relative;transition:.2s cubic-bezier(.4,0,.2,1);border:0;flex:0 0 auto}
   .sw::after{content:"";position:absolute;width:21px;height:21px;border-radius:50%;background:#fff;top:2px;left:2px;transition:.2s cubic-bezier(.4,0,.2,1);box-shadow:0 1px 3px rgba(0,0,0,.2)}
@@ -379,9 +380,10 @@
           <div class="panel">
             <div class="panel-h">策略区 · 装配 <span class="muted" style="font-weight:500">实验版 B</span></div>
             <div class="panel-b">
-              <div class="sub">Harness 模块 <span style="color:var(--text-3);font-weight:400">（A 对照组 · B 实验组；Orchestration 暂由算法团队设计）</span></div>
+              <div class="sub">Harness 模块 <span style="color:var(--text-3);font-weight:400">（A=基线锁定，只调 B；Orchestration 暂由算法团队设计）</span></div>
               <div id="modlist"></div>
-              <button class="btn primary" style="width:100%;margin-top:12px" onclick="toast('已把实验版 B 存入策略库')">存为新版本到策略库</button>
+              <button class="btn" style="width:100%;margin-top:8px" onclick="resetB()">B 全部重置为基线（从 A fork）</button>
+              <button class="btn primary" style="width:100%;margin-top:8px" onclick="toast('已把实验版 B 存入策略库')">存为新版本到策略库</button>
             </div>
           </div>
         </aside>
@@ -730,12 +732,13 @@ function renderModules(){
     return `<div class="mod ${changed?'changed':''}">
       <div class="mn">${m.name}</div><div class="mt">${m.type}</div>
       <div class="mod-ab">
-        <div class="mab"><span class="mab-l">A</span><select class="mod-ver" onchange="setVer('${m.id}','A',this.value)">${opt(m.verA)}</select></div>
+        <div class="mab"><span class="mab-l">A</span><span class="mod-lock" title="A=基线，锁定">${m.verA} · 基线</span></div>
         <div class="mab"><span class="mab-l">B</span><select class="mod-ver" onchange="setVer('${m.id}','B',this.value)">${opt(m.verB)}</select></div>
       </div>
     </div>`;
   }).join('');
 }
+function resetB(){ modules.forEach(m=>m.verB=m.verA); renderModules(); toast('已把 B 全部重置为基线（从 A fork），再逐个改 B'); }
 function setVer(id,side,v){
   const m=modules.find(x=>x.id===id); if(!m) return;
   if(side==='A') m.verA=v; else m.verB=v;
