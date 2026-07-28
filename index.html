@@ -989,6 +989,7 @@ document.getElementById('nav').addEventListener('click',e=>{
   }
   const it=e.target.closest('.nav-item'); if(!it)return;
   document.querySelectorAll('.nav-item').forEach(x=>x.classList.toggle('active',x===it));
+  document.querySelectorAll('.nav-sub').forEach(x=>x.classList.remove('active'));
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('screen-'+it.dataset.screen).classList.add('active');
 });
