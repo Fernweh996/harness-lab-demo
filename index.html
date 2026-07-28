@@ -114,7 +114,6 @@
   .v-act .btn{padding:5px 12px;font-size:12px}
   @keyframes vflash{0%{background:var(--accent-soft)}100%{background:rgba(255,255,255,.7)}}
   .verdict.flash{animation:vflash .9s ease}
-  .v-blind{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--text-2);flex:0 0 auto;margin-left:auto}
   .wb-main{flex:1;display:flex;overflow:hidden;min-height:0}
   .strategy-region{flex:0 0 300px;width:300px;overflow:auto;padding:16px 16px;border-right:1px solid var(--border);background:var(--surface)}
   .strategy-region .panel{border:0;box-shadow:none;background:transparent;border-radius:0}
@@ -163,27 +162,26 @@
   .cb{background:var(--surface-2);border:1px solid var(--border-2);border-radius:12px;padding:9px 12px;font-size:12.5px;line-height:1.55;color:var(--text)}
   .cmsg.user .cb{background:var(--accent-soft);border-color:transparent}
   .cb-act{margin-top:8px;display:flex;gap:6px;opacity:0;transition:.12s}
+  .ex-bubble:hover .cb-act{opacity:1}
   .cb-btn{border:1px solid var(--border);background:#fff;border-radius:7px;padding:2px 9px;font-size:11px;color:var(--text-2)}
   .cb-btn.good:hover{border-color:var(--good);color:var(--good)}
   .cb-btn.bad:hover{border-color:var(--bad);color:var(--bad)}
-  .chat-in{border-top:1px solid var(--border-2);padding:9px 12px;display:flex;gap:8px;align-items:center;color:var(--text-3);font-size:12px}
-  .chat-in .chat-snd{margin-left:auto;background:var(--good);color:#fff;border:0;border-radius:8px;padding:5px 13px;font-size:12px;font-weight:600}
-  /* 交互对比：两个手机聊天界面并排，各自完整收发 */
-  .pwrap{display:flex;gap:20px;height:100%;align-items:stretch}
-  .pchat{flex:1;min-width:0;display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--border-2);border-radius:18px;box-shadow:var(--shadow);overflow:hidden}
-  .pc-bar{flex:0 0 auto;text-align:center;font-size:12px;font-weight:600;color:var(--text-2);padding:12px;border-bottom:1px solid var(--border-2);background:var(--surface-2);display:flex;align-items:center;justify-content:center;gap:7px}
-  .pc-bar .dot{width:6px;height:6px;border-radius:50%;background:var(--text-3);flex:0 0 auto}
-  .pc-body{flex:1;overflow:auto;padding:16px 14px;display:flex;flex-direction:column;gap:12px;background:var(--bg)}
-  .pm{display:flex;max-width:88%}
-  .pm.user{align-self:flex-end}
-  .pm.bot{align-self:flex-start}
-  .pb{position:relative;padding:10px 13px;border-radius:16px;font-size:12.5px;line-height:1.6}
-  .pm.bot .pb{background:var(--surface);border:1px solid var(--border-2);border-bottom-left-radius:5px;color:var(--text);box-shadow:var(--shadow)}
-  .pm.user .pb{background:var(--accent);color:#fff;border-bottom-right-radius:5px}
-  .pb:hover .cb-act{opacity:1}
-  .pc-input{flex:0 0 auto;border-top:1px solid var(--border-2);padding:10px 12px;display:flex;gap:8px;align-items:center;color:var(--text-3);font-size:12px;background:var(--surface)}
-  .pc-input span{flex:1}
-  .pc-input .pc-snd{background:var(--good);color:#fff;border:0;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600}
+  .chat-in{margin:10px 12px 12px;padding:7px 7px 7px 12px;display:flex;gap:8px;align-items:center;color:var(--text-3);font-size:12px;background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,.07)}
+  .chat-in .ci-plus{flex:0 0 auto;width:22px;height:22px;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:15px;line-height:1;color:var(--text-3)}
+  .chat-in .ci-ph{flex:1;min-width:0}
+  .chat-in .chat-snd{flex:0 0 auto;margin-left:auto;background:var(--text);color:#fff;border:0;border-radius:50%;width:28px;height:28px;padding:0;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  /* 交互对比：按轮左右对齐 */
+  .xchat{height:100%;display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--border-2);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+  .ex-hd{display:flex;gap:14px;padding:12px 16px 8px;border-bottom:1px solid var(--border-2);position:relative}
+  .ex-hd::before{content:'';position:absolute;top:8px;bottom:0;left:50%;width:1px;background:var(--border-2)}
+  .ex-hcol{flex:1;font-size:12px;font-weight:600;color:var(--text-2)}
+  .xbody{flex:1;overflow:auto;padding:14px 16px;display:flex;flex-direction:column;gap:14px;position:relative}
+  .xbody::before{content:'';position:absolute;top:0;bottom:0;left:50%;width:1px;background:var(--border-2);z-index:0}
+  .xbody>*{position:relative;z-index:1}
+  .ex-q{align-self:flex-end;max-width:78%;background:var(--accent-soft);border-radius:12px;padding:8px 12px;font-size:12.5px;color:var(--text)}
+  .ex-ab{display:flex;gap:14px;align-items:flex-start}
+  .ex-cell{flex:1;min-width:0}
+  .ex-bubble{position:relative;background:var(--surface-2);border:1px solid var(--border-2);border-radius:12px;padding:9px 12px;font-size:12.5px;line-height:1.55;color:var(--text)}
   /* 推理链路（横向） */
   .chain-cols{display:flex;gap:16px;align-items:flex-start}
   .chain-col{flex:1;min-width:0;background:var(--surface);border:1px solid var(--border-2);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 16px}
@@ -341,12 +339,13 @@
   .diffbox .add{color:#63e6a0}
   .diffbox .del{color:#ff8a80}
   .diffbox .ctx{color:#98989d}
-  /* 策略对比：左右分栏 A vs B */
-  .sd-split{display:flex;gap:14px;align-items:stretch}
-  .sd-col{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
-  .sd-lab{font-size:11px;font-weight:600;color:var(--text-2);display:flex;align-items:center;gap:6px}
-  .sd-lab .dot{width:6px;height:6px;border-radius:50%;background:var(--text-3);flex:0 0 auto}
-  .sd-col .diffbox{flex:1;margin:0}
+  .diffbox .hl{display:block;border-radius:5px;padding:1px 6px;margin:1px -6px}
+  .diffbox .del.hl{background:rgba(255,138,128,.16)}
+  .diffbox .add.hl{background:rgba(99,230,160,.14)}
+  .sdiff{display:flex;gap:14px;align-items:stretch}
+  .sdiff-col{flex:1;min-width:0;display:flex;flex-direction:column}
+  .sdiff-hd{font-size:11.5px;font-weight:600;color:var(--text-2);margin-bottom:6px}
+  .sdiff .diffbox{flex:1;margin:0}
 
   /* 策略库：模块浏览 + 预览/编辑 */
   .lib{display:flex;gap:16px;align-items:flex-start}
@@ -402,11 +401,8 @@
     <!-- ============ WORKBENCH ============ -->
     <section class="screen active" id="screen-workbench">
       <div class="wb-top">
-        <div class="field" id="topCaseField"><label>Case</label>
-          <button class="btn" style="padding:6px 10px" onclick="caseStep(-1)" title="上一条">‹</button>
-          <select id="caseSel"><option>Case_20260724_001 · 客户咨询_产品介绍</option><option>Case_20260724_002 · 对外动作_订票确认</option><option>Case_20260724_003 · 记忆冲突_地址更新</option></select>
-          <button class="btn" style="padding:6px 10px" onclick="caseStep(1)" title="下一条">›</button>
-          <span id="caseProg" class="muted" style="font-size:12px">1/3</span>
+        <div class="field" id="topCaseField"><label>输入</label>
+          <input class="pill" id="manualInput" style="width:460px" placeholder="人工输入一条评测 query（Harness Eval 无 case / 评测集）">
         </div>
         <div class="field"><label>userid</label>
           <input class="pill" style="width:300px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px" value="usr_d67dd41c88be67ffe87dcf7f46681fae" title="按该用户 id 载入其上下文/记忆重放">
@@ -422,9 +418,12 @@
           <div class="panel">
             <div class="panel-h">策略区 · 装配 <span class="muted" style="font-weight:500">实验版 B</span></div>
             <div class="panel-b">
-              <div class="sub" style="display:flex;justify-content:space-between;align-items:center">
-                <span style="color:var(--text-3);font-weight:400">当前模型 hy3 · A 基线锁定，只调 B</span>
-                <span class="only-chg" id="onlyChgBtn" onclick="toggleOnlyChanged()">只看改动</span>
+              <div class="sub" style="line-height:1.6;background:var(--surface-2);border-radius:10px;padding:8px 10px;margin-bottom:10px">
+                模型说明：策略对比<b style="color:var(--text)">固定用同一模型 hy3（腾讯混元）</b>，A / B 都跑在 hy3 上，只改 harness 策略、不换模型 —— 以隔离策略本身的效果。
+              </div>
+              <div class="sub" style="display:flex;justify-content:space-between;align-items:center;gap:6px;white-space:nowrap;font-size:10px">
+                <span style="white-space:nowrap">Harness 模块 <span style="color:var(--text-3);font-weight:400">（A=基线锁定，只调 B）</span></span>
+                <span class="only-chg" id="onlyChgBtn" onclick="toggleOnlyChanged()" style="flex:0 0 auto;white-space:nowrap;font-size:10px">只看改动</span>
               </div>
               <div id="modlist"></div>
               <button class="btn" style="width:100%;margin-top:8px" onclick="resetB()">B 全部重置为基线（从 A fork）</button>
@@ -445,8 +444,8 @@
                 <div class="mn">实验组 B · 待验证模型</div><div class="mt">candidate model</div>
                 <div class="mod-ab"><div class="mab"><span class="mab-l">B</span><select class="mod-ver"><option>hy4</option><option>hy3.5</option><option>gpt-5.5</option></select></div></div>
               </div>
-              <div class="sub" style="margin-top:14px">Case</div>
-              <select class="pill" style="width:100%"><option>Case_20260724_001 · 客户咨询_产品介绍</option><option>Case_20260724_002 · 对外动作_订票确认</option><option>Case_20260724_003 · 记忆冲突_地址更新</option></select>
+              <div class="sub" style="margin-top:14px">Case（评测集）</div>
+              <select class="pill" id="modelCaseSel" style="width:100%"><option>Case_20260724_001 · 客户咨询_产品介绍</option><option>Case_20260724_002 · 对外动作_订票确认</option><option>Case_20260724_003 · 记忆冲突_地址更新</option></select>
             </div>
           </div>
         </aside>
@@ -520,7 +519,7 @@
           <table>
             <thead><tr><th>版本</th><th>改动模块</th><th>改了什么 / 决策</th><th>修改人</th><th>时间</th></tr></thead>
             <tbody id="verlog">
-              <tr><td>v1.3.0 <span class="tagx exp">实验</span></td><td>Prompt / Memory / Hooks</td><td>换 prompt v2；memory topK 3→5；关闭消息分组</td><td>小鱼（产品）</td><td>2026-07-27 11:20</td></tr>
+              <tr><td>v1.3.0 <span class="tagx exp">实验</span></td><td>Prompt / Memory</td><td>换 prompt v2；memory topK 3→5</td><td>小鱼（产品）</td><td>2026-07-27 11:20</td></tr>
               <tr><td>v1.2.3 <span class="tagx base">基线</span></td><td>Prompt</td><td>调 prompt 模板 v1</td><td>阿哲（算法）</td><td>2026-07-20 15:04</td></tr>
               <tr><td>v1.2.0</td><td>Memory</td><td>召回阈值 0.85→0.82</td><td>阿哲（算法）</td><td>2026-07-12 10:30</td></tr>
               <tr><td>v1.0.0</td><td>全部</td><td>初始版本</td><td>算法团队</td><td>2026-06-28 09:00</td></tr>
@@ -555,7 +554,8 @@ const modules = [
   {id:'tools',   name:'Tools / 工具',         type:'toolset',       versions:['v1.2.3'], verA:'v1.2.3', verB:'v1.2.3'},
   {id:'output',  name:'Output / 输出呈现',    type:'output',        versions:['v1.2.3'], verA:'v1.2.3', verB:'v1.2.3'},
   {id:'guard',   name:'Guardrails / 护栏',    type:'guardrails',    versions:['v1.2.3'], verA:'v1.2.3', verB:'v1.2.3'},
-  {id:'hooks',   name:'Hooks / 扩展',         type:'hooks',         versions:['v1.3.0','v1.2.3'], verA:'v1.2.3', verB:'v1.3.0'},
+  // Hooks / 扩展 模块暂无相应策略，暂不启用（如需恢复取消本行注释）
+  // {id:'hooks',   name:'Hooks / 扩展',         type:'hooks',         versions:['v1.3.0','v1.2.3'], verA:'v1.2.3', verB:'v1.3.0'},
 ];
 
 const convA = [
@@ -660,6 +660,7 @@ const strategyModules = [
 ## 回执
 - 做事类输出要有回执，长任务要有过程反馈。`},
 
+  /* Hooks 模块暂无相应策略，暂不启用（如需恢复删除本段注释）
   {id:'hooks', name:'Hooks / 主动消息', type:'hooks', version:'v1.3.0', tags:['实验'], changed:true, source:
 `# 主动消息 · Hooks
 
@@ -678,6 +679,7 @@ const strategyModules = [
 ## 频控
 - 低频、可忽略、可降权。
 - 忽略 1 次进 7 天冷却；连续忽略 2 次仅在新证据时触发。`},
+  */
 
   {id:'guardrails', name:'Guardrails / 护栏', type:'guardrails', version:'v1.2.3', tags:['基线'], changed:false, source:
 `# 护栏 · Guardrails
@@ -696,7 +698,7 @@ const strategyModules = [
 const moduleDiffs = {
   prompt:[{ctx:'## 风格'},{del:'- 语气统一专业、简洁，200 字以内'},{add:'+ 结论先行，短回复不堆结构'},{add:'+ 语气随关系画像调浓淡（v2）'}],
   memory:[{ctx:'## 召回'},{del:'- topK = 3，阈值 0.82'},{add:'+ topK = 5，阈值 0.80'},{add:'+ 增加背景召回'}],
-  hooks:[{ctx:'## 消息分组'},{del:'- enabled: true'},{add:'+ enabled: false（本版关闭分组）'}],
+  // hooks:[{ctx:'## 消息分组'},{del:'- enabled: true'},{add:'+ enabled: false（本版关闭分组）'}],  // Hooks 暂不启用
 };
 let libSel='prompt', libMode='preview';
 function renderDiff(m){
@@ -760,8 +762,6 @@ function updateLibSource(v){ const m=strategyModules.find(x=>x.id===libSel); if(
 let client = 'wechat';
 let tab = 'interact';
 let onlyChanged = false;
-let blind = false;
-function toggleBlind(){ blind=!blind; renderCenter(); renderVerdict(); }
 
 /* ---------------- render ---------------- */
 function renderModules(){
@@ -833,29 +833,28 @@ function chatFlow(conv, tag){
     }
   }
   return `<div class="chat"><div class="chat-body">${body}</div>
-    <div class="chat-in">输入消息…<button class="chat-snd">发送</button></div></div>`;
+    <div class="chat-in"><span class="ci-plus">+</span><span class="ci-ph">输入消息…</span><button class="chat-snd" aria-label="发送">↑</button></div></div>`;
 }
 function saveCase(tag,kind){ toast('已存为 '+(kind==='good'?'good':'bad')+'case（query + '+tag+' 版输出）到 Case 库'); }
-function phoneCol(conv, tag, label){
-  let body='';
-  for(const t of conv){
-    if(t.role==='user'){
-      body+=`<div class="pm user"><div class="pb">${t.text}</div></div>`;
-    }else{
-      body+=`<div class="pm bot"><div class="pb">${t.text}
-        <div class="cb-act"><button class="cb-btn good" onclick="saveCase('${tag}','good')">👍 存 goodcase</button><button class="cb-btn bad" onclick="saveCase('${tag}','bad')">👎 存 badcase</button></div>
-      </div></div>`;
-    }
-  }
-  return `<div class="pchat">
-    <div class="pc-bar"><span class="dot"></span>${label}</div>
-    <div class="pc-body">${body}</div>
-    <div class="pc-input"><span>输入消息…</span><button class="pc-snd">发送</button></div>
+function exBubble(text,tag){
+  return `<div class="ex-bubble">${text}
+    <div class="cb-act"><button class="cb-btn good" onclick="saveCase('${tag}','good')">👍 存 goodcase</button><button class="cb-btn bad" onclick="saveCase('${tag}','bad')">👎 存 badcase</button></div>
   </div>`;
 }
 function alignedChat(){
-  const la = blind?'版本 甲':'A · 对照组', lb = blind?'版本 乙':'B · 实验组';
-  return `<div class="pwrap">${phoneCol(convA,'A',la)}${phoneCol(convB,'B',lb)}</div>`;
+  let rows='';
+  for(let i=0;i<convA.length;i++){
+    if(convA[i].role==='user'){
+      rows+=`<div class="ex-q">${convA[i].text}</div>`;
+    }else{
+      rows+=`<div class="ex-ab"><div class="ex-cell">${exBubble(convA[i].text,'A')}</div><div class="ex-cell">${exBubble((convB[i]||{}).text||'','B')}</div></div>`;
+    }
+  }
+  return `<div class="xchat">
+    <div class="ex-hd"><div class="ex-hcol">A · 对照组</div><div class="ex-hcol">B · 实验组</div></div>
+    <div class="xbody">${rows}</div>
+    <div class="chat-in"><span class="ci-plus">+</span><span class="ci-ph">输入消息…</span><button class="chat-snd" aria-label="发送">↑</button></div>
+  </div>`;
 }
 
 function renderCenter(){
@@ -869,23 +868,19 @@ function renderCenter(){
       ? `<div class="sub">A / B 各模块版本一致，无策略差异。</div>`
       : changed.map(m=>{
           const d=moduleDiffs[m.id]||[];
-          const side=(which)=>d.map(x=>{
-            if(x.ctx) return `<span class="ctx">${esc(x.ctx)}</span>`;
-            if(which==='A') return x.del?`<span class="del">${esc(x.del.replace(/^-\s*/,''))}</span>`:'';
-            return x.add?`<span class="add">${esc(x.add.replace(/^\+\s*/,''))}</span>`:'';
-          }).filter(Boolean).join('<br>');
-          const la=side('A'), lb=side('B');
-          return `<div style="margin-bottom:16px">
-            <div style="font-weight:600;font-size:13px;margin-bottom:8px">${m.name} <span class="muted" style="font-weight:400">${m.type}</span></div>
-            <div class="sd-split">
-              <div class="sd-col"><div class="sd-lab"><span class="dot"></span>A · 基线 ${m.verA}</div><div class="diffbox">${la||'（空）'}</div></div>
-              <div class="sd-col"><div class="sd-lab"><span class="dot"></span>B · 实验 ${m.verB}</div><div class="diffbox">${lb||'（空）'}</div></div>
+          const aLines = d.filter(x=>!x.add).map(x=>x.ctx?`<span class="ctx">${esc(x.ctx)}</span>`:`<span class="del hl">${esc(x.del)}</span>`).join('<br>');
+          const bLines = d.filter(x=>!x.del).map(x=>x.ctx?`<span class="ctx">${esc(x.ctx)}</span>`:`<span class="add hl">${esc(x.add)}</span>`).join('<br>');
+          return `<div style="margin-bottom:18px">
+            <div style="font-weight:600;font-size:13px;margin-bottom:8px">${m.name} <span class="muted" style="font-weight:400">${m.type} · A ${m.verA} → B ${m.verB}</span></div>
+            <div class="sdiff">
+              <div class="sdiff-col"><div class="sdiff-hd">A · ${m.verA} · 基线</div><div class="diffbox">${aLines||'（无内容）'}</div></div>
+              <div class="sdiff-col"><div class="sdiff-hd">B · ${m.verB} · 实验</div><div class="diffbox">${bLines||'（无内容）'}</div></div>
             </div>
           </div>`;
         }).join('');
     el.innerHTML = `
       <div class="panel">
-        <div class="panel-h">策略改前后对比 · 左 A 基线 / 右 B 实验 <span class="muted" style="font-weight:500">${changed.length} 个模块改动 · 左红=删 右绿=增</span></div>
+        <div class="panel-h">策略改前后对比 · A（基线）vs B（实验）左右分栏 <span class="muted" style="font-weight:500">${changed.length} 个模块改动 · 左红=删 右绿=增，高亮为差异行</span></div>
         <div class="panel-b">${body}</div>
       </div>`;
   } else if(tab==='casediff'){
@@ -914,6 +909,8 @@ function renderCenter(){
         <div class="sub" style="margin-top:12px">推理链路逐步对齐 diff：蓝色 = A/B 有差异或 B 新增的步骤（v2 决定先联网 → 多一步联网搜索、生成更长）。</div>
       </div>`;
   } else if(tab==='metrics'){
+    const isModel = !!(document.querySelector('.nav-sub.active') && document.querySelector('.nav-sub.active').dataset.mode==='model');
+    const scope = isModel ? 'case set 客户咨询回归 (8)' : '人工输入评测 · 单条（无 case / 评测集）';
     const rows = metrics.map(m=>`
       <tr>
         <td>${m.name}</td>
@@ -930,34 +927,10 @@ function renderCenter(){
             <tbody>${rows}</tbody>
           </table>
         </div>
-      </div>
-      <div class="panel" style="margin-top:14px">
-        <div class="panel-h">恶化排序 <span class="muted" style="font-weight:500">B 相对 A 变差的地方</span></div>
-        <div class="panel-b">
-          <ul class="worse-list">
-            <li><span>任务完成耗时</span><span class="delta bad">▼ +0.94s</span></li>
-            <li><span>首字延迟 TTFT</span><span class="delta bad">▼ +0.3s</span></li>
-            <li><span>Token 消耗</span><span class="delta bad">▼ +378</span></li>
-            <li><span>工具调用数</span><span class="delta bad">▼ +1（多一次联网）</span></li>
-          </ul>
-          <div class="sub" style="margin-top:10px">结论：B 更慢、更贵、多调一次工具；内容是否更好，看交互对话与人工评语（机评后期接入）。</div>
-        </div>
       </div>`;
   } else {
     el.innerHTML = `
       <div class="eval-grid">
-        <div class="panel">
-          <div class="panel-h">人工评价 <span class="muted" style="font-weight:500">当前 case</span></div>
-          <div class="panel-b">
-            <div class="score-row"><span>整体倾向</span><span class="radio">${blind?'<span>○ 甲更好</span><span class="on">● 乙更好</span><span>○ 相当</span>':'<span>○ A 更好</span><span class="on">● B 更好</span><span>○ 相当</span>'}</span></div>
-            ${blind?'<div class="sub" style="margin:2px 0 8px">盲评中：已隐藏哪版是实验版。</div>':''}
-            <div class="score-row"><span>是否守分寸</span><span class="radio"><span class="on">● 是</span><span>○ 否</span></span></div>
-            <div class="score-row"><span>是否越红线</span><span class="radio"><span>○ 是</span><span class="on">● 否</span></span></div>
-            <div class="hi-label" style="margin-top:12px">评语</div>
-            <textarea class="hi-ta" placeholder="主观评价，如：B 更亲和、信息更全，但偏啰嗦、成本涨得多"></textarea>
-            <button class="btn primary hi-full" onclick="toast('已提交人工评价')">提交评价</button>
-          </div>
-        </div>
         <div class="panel">
           <div class="panel-h">机评 <span class="muted" style="font-weight:500">后期接入</span></div>
           <div class="panel-b">
@@ -965,9 +938,21 @@ function renderCenter(){
             <div class="judge">第一期只做客观指标（TTFT / 任务完成耗时 / Token / 工具调用数）+ 人工评价；机评（评审模型 gpt-5.5）二期再上，用于扩大评测规模、和人评做一致性校准。</div>
           </div>
         </div>
+        <div class="panel">
+          <div class="panel-h">人评 <span class="muted" style="font-weight:500">当前 case</span></div>
+          <div class="panel-b">
+            <div class="hi-label">人工评语</div>
+            <textarea class="hi-ta" oninput="syncComment(this.value)" placeholder="对本次 A/B 的主观评价，如：B 更亲和但偏啰嗦、成本涨得不值">${esc(hiComment)}</textarea>
+            <button class="btn primary hi-full" onclick="toast('已记录评语')">记录评语</button>
+          </div>
+        </div>
       </div>`;
   }
 }
+
+// 人工评语：效果评估页的人评 与 实时指标对比 rail 共用同一份内容，实时同步
+let hiComment='';
+function syncComment(v){ hiComment=v; document.querySelectorAll('.hi-ta').forEach(t=>{ if(t.value!==v) t.value=v; }); }
 
 function renderRail(){
   const el = document.getElementById('metricrail');
@@ -982,7 +967,7 @@ function renderRail(){
     + `<div class="sub" style="margin:10px 0 0">第一期客观指标；机评（LLM 打分）后期接入</div>`
     + `<div class="hi-note">
         <div class="hi-label">人工评语</div>
-        <textarea class="hi-ta" placeholder="对本次 A/B 的主观评价，如：B 更亲和但偏啰嗦、成本涨得不值"></textarea>
+        <textarea class="hi-ta" oninput="syncComment(this.value)" placeholder="对本次 A/B 的主观评价，如：B 更亲和但偏啰嗦、成本涨得不值">${esc(hiComment)}</textarea>
         <button class="hi-btn hi-full" onclick="toast('已记录评语')">记录评语</button>
       </div>`;
 }
@@ -1009,26 +994,20 @@ document.getElementById('nav').addEventListener('click',e=>{
   }
   const it=e.target.closest('.nav-item'); if(!it)return;
   document.querySelectorAll('.nav-item').forEach(x=>x.classList.toggle('active',x===it));
-  document.querySelectorAll('.nav-sub').forEach(x=>x.classList.remove('active'));
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('screen-'+it.dataset.screen).classList.add('active');
 });
 
 function renderVerdict(){
   const el=document.getElementById('verdict'); if(!el) return;
-  const blindCtl = `<span class="v-blind">盲评 <button class="sw ${blind?'on':''}" onclick="toggleBlind()" title="隐藏哪版是实验版，避免打分偏见"></button></span>`;
-  if(blind){
-    el.innerHTML = `<span class="v-tag warn">盲评中</span><span class="v-reason">已隐藏哪版是实验版——先在效果评估里给「甲 / 乙」打分，评完关闭盲评再看结论。</span>${blindCtl}`;
-    return;
-  }
   const model = document.querySelector('.nav-sub.active') && document.querySelector('.nav-sub.active').dataset.mode==='model';
-  el.innerHTML = (model
+  el.innerHTML = model
     ? `<span class="v-tag good">B 略优</span><span class="v-main">模型 B · hy4</span>
        <span class="v-reason">逐 case 略优（订票确认门、记忆冲突处理更好），首字/耗时更快；Token 略高，兜底一条 A 更稳。</span>
        <div class="v-act"><button class="btn" onclick="decide('保持 hy3')">保持 A</button><button class="btn primary" onclick="decide('采用 hy4')">采用 B</button></div>`
     : `<span class="v-tag warn">需权衡</span><span class="v-main">B 实验版 v1.3.0</span>
        <span class="v-reason">质量倾向 B（更完整、亲和），但代价：延迟 +76% · Token +44% · 多调 1 次工具。</span>
-       <div class="v-act"><button class="btn" onclick="decide('保持 A')">保持 A</button><button class="btn primary" onclick="decide('采用 B')">采用 B</button></div>`) + blindCtl;
+       <div class="v-act"><button class="btn" onclick="decide('保持 A')">保持 A</button><button class="btn primary" onclick="decide('采用 B')">采用 B</button></div>`;
 }
 function decide(d){
   const tb=document.getElementById('verlog');
@@ -1075,21 +1054,7 @@ function toast(msg){
 const caseSel=document.getElementById('caseSel');
 const runBtn=document.getElementById('runBtn');
 const runIndicator=document.getElementById('runIndicator');
-let running=false, runTimer=null, runProg=null, expNo=41;
-function archiveExperiment(){
-  const tb=document.getElementById('verlog'); if(!tb) return;
-  expNo++;
-  const model = document.querySelector('.nav-sub.active') && document.querySelector('.nav-sub.active').dataset.mode==='model';
-  const cv=document.getElementById('caseSel'); const caseName=cv?((cv.value.split(' · ')[1])||cv.value):'';
-  const changed = modules.filter(m=>m.verA!==m.verB).map(m=>m.name.split(' / ')[0]).join('、')||'—';
-  const now=new Date().toLocaleString('zh-CN',{hour12:false});
-  const summary = model
-    ? '模型 A(hy3) vs B(hy4) on '+caseName+'：B 略优，结论待定'
-    : 'A vs B on '+caseName+'：延迟 +76% · Token +44% · 多调 1 次工具（需权衡）';
-  const tr=document.createElement('tr');
-  tr.innerHTML='<td>实验 #'+expNo+'</td><td>'+(model?'（换模型）':changed)+'</td><td>'+summary+'</td><td>'+(model?'算法':'产品')+'</td><td>'+now+'</td>';
-  tb.prepend(tr);
-}
+let running=false, runTimer=null, runProg=null;
 function resetIndicator(){ if(runIndicator){ clearInterval(runProg); runProg=null; runIndicator.style.display='none'; runIndicator.innerHTML='<span class="dot"></span>对比跑 运行中'; } }
 
 function startRun(){
@@ -1120,23 +1085,23 @@ function finishRun(){
   resetIndicator();
   renderCenter(); renderRail(); renderVerdict();
   const v=document.getElementById('verdict'); if(v){ v.classList.remove('flash'); void v.offsetWidth; v.classList.add('flash'); }
-  archiveExperiment();
-  toast('运行完成 · 已存档到版本记录 · 结论见顶部');
+  toast('运行完成 · 结论见顶部');
 }
 runBtn.addEventListener('click',()=>{
   if(running){ stopRun(); return; }
   if(runBtn.disabled) return;
   startRun();
 });
-caseSel.addEventListener('change',()=>{
+if(caseSel) caseSel.addEventListener('change',()=>{
   if(running) stopRun();
   runBtn.disabled=false; runBtn.textContent='开始运行';
   runBtn.classList.remove('stop'); runBtn.classList.add('primary');
   updateCaseProg();
   toast('已切换到新 case，点“开始运行”跑一遍');
 });
-function updateCaseProg(){ const el=document.getElementById('caseProg'); if(el) el.textContent=(caseSel.selectedIndex+1)+'/'+caseSel.options.length; }
+function updateCaseProg(){ const el=document.getElementById('caseProg'); if(el&&caseSel) el.textContent=(caseSel.selectedIndex+1)+'/'+caseSel.options.length; }
 function caseStep(d){
+  if(!caseSel) return;
   const n=caseSel.options.length;
   const ni=Math.min(n-1,Math.max(0,caseSel.selectedIndex+d));
   if(ni===caseSel.selectedIndex) return;
