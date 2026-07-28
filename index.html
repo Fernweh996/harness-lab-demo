@@ -341,6 +341,12 @@
   .diffbox .add{color:#63e6a0}
   .diffbox .del{color:#ff8a80}
   .diffbox .ctx{color:#98989d}
+  /* 策略对比：左右分栏 A vs B */
+  .sd-split{display:flex;gap:14px;align-items:stretch}
+  .sd-col{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+  .sd-lab{font-size:11px;font-weight:600;color:var(--text-2);display:flex;align-items:center;gap:6px}
+  .sd-lab .dot{width:6px;height:6px;border-radius:50%;background:var(--text-3);flex:0 0 auto}
+  .sd-col .diffbox{flex:1;margin:0}
 
   /* 策略库：模块浏览 + 预览/编辑 */
   .lib{display:flex;gap:16px;align-items:flex-start}
@@ -863,15 +869,23 @@ function renderCenter(){
       ? `<div class="sub">A / B 各模块版本一致，无策略差异。</div>`
       : changed.map(m=>{
           const d=moduleDiffs[m.id]||[];
-          const diff = d.map(x=>x.ctx?`<span class="ctx">${esc(x.ctx)}</span>`:x.del?`<span class="del">${esc(x.del)}</span>`:`<span class="add">${esc(x.add)}</span>`).join('<br>');
+          const side=(which)=>d.map(x=>{
+            if(x.ctx) return `<span class="ctx">${esc(x.ctx)}</span>`;
+            if(which==='A') return x.del?`<span class="del">${esc(x.del.replace(/^-\s*/,''))}</span>`:'';
+            return x.add?`<span class="add">${esc(x.add.replace(/^\+\s*/,''))}</span>`:'';
+          }).filter(Boolean).join('<br>');
+          const la=side('A'), lb=side('B');
           return `<div style="margin-bottom:16px">
-            <div style="font-weight:600;font-size:13px;margin-bottom:6px">${m.name} <span class="muted" style="font-weight:400">${m.type} · A ${m.verA} → B ${m.verB}</span></div>
-            <div class="diffbox">${diff||'（无字段级 diff）'}</div>
+            <div style="font-weight:600;font-size:13px;margin-bottom:8px">${m.name} <span class="muted" style="font-weight:400">${m.type}</span></div>
+            <div class="sd-split">
+              <div class="sd-col"><div class="sd-lab"><span class="dot"></span>A · 基线 ${m.verA}</div><div class="diffbox">${la||'（空）'}</div></div>
+              <div class="sd-col"><div class="sd-lab"><span class="dot"></span>B · 实验 ${m.verB}</div><div class="diffbox">${lb||'（空）'}</div></div>
+            </div>
           </div>`;
         }).join('');
     el.innerHTML = `
       <div class="panel">
-        <div class="panel-h">策略改前后对比 · A（基线 v1.2.3）vs B（实验 v1.3.0） <span class="muted" style="font-weight:500">${changed.length} 个模块改动 · 红=删 绿=增</span></div>
+        <div class="panel-h">策略改前后对比 · 左 A 基线 / 右 B 实验 <span class="muted" style="font-weight:500">${changed.length} 个模块改动 · 左红=删 右绿=增</span></div>
         <div class="panel-b">${body}</div>
       </div>`;
   } else if(tab==='casediff'){
