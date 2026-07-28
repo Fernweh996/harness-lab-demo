@@ -485,8 +485,8 @@
         <p class="lead">历史策略版本日志：谁、什么时间、改了什么。（mock）</p>
         <div class="card2" style="padding:0;overflow:hidden">
           <table>
-            <thead><tr><th>版本</th><th>改动模块</th><th>改了什么</th><th>修改人</th><th>时间</th></tr></thead>
-            <tbody>
+            <thead><tr><th>版本</th><th>改动模块</th><th>改了什么 / 决策</th><th>修改人</th><th>时间</th></tr></thead>
+            <tbody id="verlog">
               <tr><td>v1.3.0 <span class="tagx exp">实验</span></td><td>Prompt / Memory / Hooks</td><td>换 prompt v2；memory topK 3→5；关闭消息分组</td><td>小鱼（产品）</td><td>2026-07-27 11:20</td></tr>
               <tr><td>v1.2.3 <span class="tagx base">基线</span></td><td>Prompt</td><td>调 prompt 模板 v1</td><td>阿哲（算法）</td><td>2026-07-20 15:04</td></tr>
               <tr><td>v1.2.0</td><td>Memory</td><td>召回阈值 0.85→0.82</td><td>阿哲（算法）</td><td>2026-07-12 10:30</td></tr>
@@ -987,7 +987,16 @@ function renderVerdict(){
        <span class="v-reason">质量倾向 B（更完整、亲和），但代价：延迟 +76% · Token +44% · 多调 1 次工具。</span>
        <div class="v-act"><button class="btn primary" onclick="decide('采用 B')">采用 B</button><button class="btn" onclick="decide('保持 A')">保持 A</button><button class="btn" onclick="decide('再评')">再评</button></div>`;
 }
-function decide(d){ toast('已记录决策：'+d+'（含人评）到版本记录'); }
+function decide(d){
+  const tb=document.getElementById('verlog');
+  if(tb){
+    const now=new Date().toLocaleString('zh-CN',{hour12:false});
+    const tr=document.createElement('tr');
+    tr.innerHTML='<td>决策</td><td>—</td><td>'+d+'（含人工评价）</td><td>产品</td><td>'+now+'</td>';
+    tb.prepend(tr);
+  }
+  toast('已记录决策：'+d+' → 版本记录');
+}
 
 function setMode(m){
   const ph=document.getElementById('panel-harness'), pm=document.getElementById('panel-model');
